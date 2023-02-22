@@ -1,11 +1,33 @@
 const models = require('../ORM/models')
 const LubricationSheet = models.lubrication_sheet;
 const LubricationSheetSparePart = models.lubrication_sheet_spare_part
+const MaintenanceFrequency = models.maintenance_frequency
+const Equipment = models.equipment
+const SparePart = models.spare_part
 const equipmentController = require('./equipmentController')
 
 const { Utils } = require('../utils/utils')
 
-const includes = ['equipments', 'lubrication_sheet_spare_parts']
+const includes = [
+    {
+      model: Equipment,
+      as: 'equipments'
+    },
+    {
+      model: LubricationSheetSparePart,
+      as: 'lubrication_sheet_spare_parts',
+      include: [
+        {
+          model: SparePart,
+          as: 'spare_part'
+        },
+        {
+          model: MaintenanceFrequency,
+          as: 'frequencies'
+        }
+      ]
+    }
+  ]
 
 const LUBRICATION_SHEET_NOT_FOUND = `Lubrication sheet not found.`
 const ERROR_CREATING_LUBRICATION_SHEET = `Error creating lubrication sheet.`
@@ -13,6 +35,7 @@ const SHEET_CREATED = `Lubrication Sheet created succesfully.`
 const SHEET_DELETED = `Lubrication Sheet deleted succesfully.`
 const ERROR_DELETING_SHEET = `Error deleting lubrication sheet.`
 const ERROR_CREATING_SHEET_ROWS = `Error creating sheet rows.`
+const ERROR_CREATING_MAINTENANCE_FREQUENCIES = `Error creating maintenance frequencies.`
 
 const getLubricationSheetList = async (req, res) => {
     try {
@@ -121,8 +144,11 @@ const addSparePartToLubricationSheet = async (req, res) => {
         if (!equipment) return res.status(404).send(equipmentController.EQUIPMENT_NOT_FOUND)
         const sheet = await findOrCreateLubricationSheet(sheetQuery)
         if (!sheet) return res.status(404).send(ERROR_CREATING_LUBRICATION_SHEET)
+        const frequencies = await createMaintenanceFrequencies(body.frequencies, sheet.id)
+        if (!frequencies) return res.status(404).send(ERROR_CREATING_MAINTENANCE_FREQUENCIES)
         const sheetRows = await createLubricationSheetRows(body.spare_parts, sheet.id)
         if (!sheetRows) return res.status(404).send(ERROR_CREATING_SHEET_ROWS)
+        await linkMaintenanceFrequenciesToLubricationSheetSpareParts(body.spare_parts, frequencies, sheetRows)
         sheet.addEquipments(equipment)
         return Utils.successResponse(res, {
             message: `Lubrication Sheet ${sheet.id} with ${sheetRows.length} rows created and added to equipment ${equipment.code} succesfully.`,
@@ -159,6 +185,23 @@ async function findOrCreateLubricationSheet(query) {
 	} else {
 		return await LubricationSheet.create()
 	}
+}
+
+async function createMaintenanceFrequencies(frequencies, sheet_id) {
+    const freqs = frequencies.map((freq) => {
+        return ({
+            lubrication_sheet_id: sheet_id,
+            frequency: freq
+        })
+    })
+    return await MaintenanceFrequency.bulkCreate(freqs);
+}
+
+async function linkMaintenanceFrequenciesToLubricationSheetSpareParts(spare_parts, frequencies, sheet_rows) {
+    spare_parts.forEach((part) => {
+        const freqs = frequencies.filter((freq) => part.frequencies.includes(freq.frequency))
+        sheet_rows.find((row) => row.spare_part_id === part.spare_part_id).addFrequencies(freqs)
+    })
 }
 
 async function createLubricationSheetRows(spare_parts, sheet_id) {

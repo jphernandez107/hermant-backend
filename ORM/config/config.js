@@ -23,7 +23,7 @@ module.exports = {
   test: {
     username: DB_USERNAME,
     password: DB_PASSWORD,
-    database: DB_DATABASE,
+    database: `${DB_DATABASE}-tests`,
     port: DB_PORT,
     host: DB_HOST,
     dialect: "mysql",

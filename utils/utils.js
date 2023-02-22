@@ -19,6 +19,7 @@ class Utils {
      * Validates body structure
      * {
      *   "equipment_code": "EQ-01",
+     *   "frequencies": [250, 500, 1000]
      *   "spare_parts": [
      *       { "spare_part_id": 22, "quantity": 3, "application": "Primary"},
      *       { "spare_part_id": 23, "quantity": 6, "application": "Secondary"},
@@ -29,7 +30,7 @@ class Utils {
      * @returns a string with an error message, or null if everything is fine
      */
     static validateBody(body) {
-        const requiredFields = ["equipment_code", "spare_parts"];
+        const requiredFields = ["equipment_code", "spare_parts", "frequencies"];
         const sparePartFields = ["spare_part_id", "quantity", "application"];
 
         for (const field of requiredFields) {

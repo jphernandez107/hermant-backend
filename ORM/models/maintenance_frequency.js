@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
 				as: 'maintenances',
 				foreignKey: "maintenance_frequency_id"
 			})
+            MaintenanceFrequency.belongsToMany(models.lubrication_sheet_spare_part, {
+                through: models.maintenance_frequency_lubrication_sheet_spare_part,
+                as: 'lubrication_sheet_spare_parts',
+                foreignKey: 'maintenance_frequency_id'
+            })
         }
     };
     MaintenanceFrequency.init({

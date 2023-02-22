@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'lubrication_sheet_id',
                 onDelete: 'CASCADE'
             });
+            LubricationSheetSparePart.belongsToMany(models.maintenance_frequency, {
+                through: models.maintenance_frequency_lubrication_sheet_spare_part,
+                as: 'frequencies',
+                foreignKey: 'lubrication_sheet_spare_part_id'
+            })
         }
     };
     LubricationSheetSparePart.init({
