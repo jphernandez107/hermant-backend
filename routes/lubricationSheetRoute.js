@@ -8,6 +8,9 @@ router.get('/list', lubricationSheetController.getLubricationSheetList);
 // get a specific lubrication sheet by id
 router.get('/details', lubricationSheetController.getLubricationSheetById);
 
+// get a specific lubrication sheet by id
+router.get('/equipment', lubricationSheetController.getLubricationSheetByEquipmentCode);
+
 // create a new lubrication sheet
 router.post('/new', lubricationSheetController.createNewLubricationSheet);
 

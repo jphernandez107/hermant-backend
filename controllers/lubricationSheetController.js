@@ -74,6 +74,27 @@ const getLubricationSheetById = async (req, res) => {
     return lubricationSheet
 }
 
+const getLubricationSheetByEquipmentCode = async (req, res) => {
+    try {
+        const sheet = await findLubricationSheetByEquipmentCode(req.query)
+        if (!sheet) return res.status(404).send(LUBRICATION_SHEET_NOT_FOUND)
+        return res.status(200).json(sheet)
+    } catch (error) {
+        catchError(res, error, LUBRICATION_SHEET_NOT_FOUND)
+    }
+}
+
+const findLubricationSheetByEquipmentCode = async (query) => {
+    const include = [...includes]
+    include[0].where = {
+        code:query.equipment_code
+    }
+    const sheet = await LubricationSheet.findOne ({
+        include: includes,
+    })
+    return sheet;
+}
+
 const createNewLubricationSheet = async (req, res) => {
     let equipmentQuery = {
         id: req.query.id,
@@ -250,6 +271,7 @@ module.exports = {
     createNewLubricationSheet,
     deleteLubricationSheetById,
     addSparePartToLubricationSheet,
-    findLubricationSheetById
+    findLubricationSheetById,
+    getLubricationSheetByEquipmentCode
 }
 
