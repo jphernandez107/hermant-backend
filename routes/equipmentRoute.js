@@ -17,6 +17,9 @@ router.delete('/delete', equipmentController.deleteEquipment);
 // update a specific equipment
 router.put('/edit', equipmentController.updateEquipment);
 
+// add use hours to equipment
+router.post('/hours', equipmentController.addUseHours)
+
 // // add lubrication sheet to a specific equipment
 // router.put('/lubricationsheet/add', equipmentController.addLubricationSheetToEquipment);
 
