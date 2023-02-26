@@ -102,14 +102,14 @@ const updateEquipment = async (req, res) => {
 const addUseHours = async (req, res) => {
     const body = req.body
     const equipmentQuery = {
-        id: body.equipment_id,
-        code: body.equipment_code
+        id: req.query.id,
+        code: req.query.code
     }
     let equipmentHourBody = {
-        hours_to_add: body.hours_to_add,
+        hours_to_add: parseInt(body.hours_to_add),
         date: body.date,
         observations: body.observations,
-        user_id: body.user_id
+        user_id: body.user_id || 0
     }
     try {
         if (equipmentHourBody.hours_to_add < 0) return res.status(400).send(CANNOT_ADD_NEGATIVE_HOURS);
@@ -120,7 +120,7 @@ const addUseHours = async (req, res) => {
         const site = equipment.construction_sites[0]
 
         equipmentHourBody.equipment_id = equipment.id;
-        equipmentHourBody.construction_site_id = site.id;
+        equipmentHourBody.construction_site_id = site ? site.id : null;
         equipmentHourBody.total_hours = equipment.total_hours;
         equipmentHourBody.partial_hours = equipment.partial_hours;
         const equipment_hour = await EquipmentHour.create(equipmentHourBody)
@@ -138,7 +138,8 @@ const addUseHours = async (req, res) => {
         return res.status(200).json({
             message: `Equipment hour ${equipment_hour.id} added to equipment ${equipmentUpdated.code} succsesfully.`,
             site: site,
-            equipment: equipmentUpdated
+            equipment: equipmentUpdated,
+            use_hour: equipment_hour
         })
     } catch (error) {
         catchError(res, error, "Error trying to add use hours to equipment.")
