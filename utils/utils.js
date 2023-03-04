@@ -53,6 +53,13 @@ class Utils {
 
         return null;
     }
+
+    static throwError(code, message) {
+        return {
+            "error_code": code,
+            "message": message
+        }
+    }
 }
 
 module.exports = {

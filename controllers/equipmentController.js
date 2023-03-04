@@ -1,12 +1,27 @@
 const { Utils } = require('../utils/utils');
 const models = require('../ORM/models')
 const Equipment = models.equipment;
+const ConstructionSite = models.construction_site
+const Maintenance = models.maintenance
+const MaintenanceFrequency = models.maintenance_frequency
 const EquipmentHour = models.equipment_hour;
-const constructionSiteController = require('./constructionSiteController')
 
-// const LubricationSheetController = require('./lubricationSheetController')
-
-const includes = ['construction_sites', 'maintenances']
+const includes = [
+    {
+      model: ConstructionSite,
+      as: 'construction_sites'
+    },
+    {
+      model: Maintenance,
+      as: 'maintenances',
+      include: [
+        {
+          model: MaintenanceFrequency,
+          as: 'maintenance_frequency'
+        }
+      ]
+    }
+  ]
 
 const EQUIPMENT_NOT_FOUND = `Equipment not found.`
 const ERROR_CREATING_EQUIPMENT = `Error creating new equipment.`

@@ -1,12 +1,14 @@
 const models = require('../ORM/models')
 const Maintenance = models.maintenance;
 const MaintenanceSparePart = models.maintenance_spare_part
+const MaintenanceFrequency = models.maintenance_frequency;
 const equipmentController = require('./equipmentController')
 const sparePartController = require('./sparePartController')
 
-const { Utils } = require('../utils/utils')
+const { Utils } = require('../utils/utils');
 
 const MAINTENANCE_NOT_FOUND = `Maintenance not found.`
+const FREQUENCY_NOT_FOUND = `Maintenance frequency not found.`
 const ERROR_CREATING_MAINTENANCE = `Error creating a maintenance.`
 const ERROR_CREATING_MAINTENANCE_ROWS = `Error creating maintenance rows`
 
@@ -37,26 +39,38 @@ const createMaintenance = async (req, res) => {
 	}
 
 	let maintenance_date = body.maintenance_date ? body.maintenance_date : new Date()
+	let reset_equipment_partial_hours = body.reset_equipment_partial_hours ? body.reset_equipment_partial_hours : true;
 
+	const transaction = await Maintenance.sequelize.transaction()
 	try {
 		const equipment = await equipmentController.findEquipmentByIdOrCode(equipmentQuery)
-		if (!equipment) return res.status(404).send(equipmentController.EQUIPMENT_NOT_FOUND)
+		if (!equipment) throw Utils.throwError(404, equipmentController.EQUIPMENT_NOT_FOUND)
+		const maintenanceFrequency = await getMaintenanceFrequency(equipment.lubrication_sheet_id, body.maintenance_frequency)
+		if (!maintenanceFrequency) throw Utils.throwError(404, FREQUENCY_NOT_FOUND)
 		const maintenance = await Maintenance.create({
-			maintenance_frequency_id: body.maintenance_frequency_id,
+			maintenance_frequency_id: maintenanceFrequency.id,
 			equipment_id: equipment.id,
 			maintenance_date: maintenance_date,
 			equipment_total_hours: equipment.total_hours,
 			equipment_partial_hours: equipment.partial_hours,
 			maintenance_cost: 0,
-			maintenance_duration: 6,
+			maintenance_duration: body.maintenance_duration,
 			observations: body.observations ? body.observations : null
 		})
-		if (!maintenance) return res.status(404).send(MAINTENANCE_NOT_FOUND)
+		if (!maintenance) throw Utils.throwError(404, MAINTENANCE_NOT_FOUND)
 		const spareParts = await getSpareParts(body.spare_parts)
-		if (!spareParts) return res.status(404).send(sparePartController.PART_NOT_FOUND)
+		if (!spareParts) throw Utils.throwError(404, sparePartController.PART_NOT_FOUND)
 		const partsWithCosts = getPartialCostForRow(spareParts, body.spare_parts)
-		await createMaintenanceRows(partsWithCosts, res, equipment, maintenance)
+		const successResponse = await createMaintenanceRows(partsWithCosts, res, equipment, maintenance)
+		if (reset_equipment_partial_hours) {
+			await equipment.update({
+				partial_hours: 0
+			})
+		}
+		Utils.successResponse(res, successResponse)
+		await transaction.commit()
 	} catch (error) {
+		await transaction.rollback()
 		catchError(res, error, ERROR_CREATING_MAINTENANCE)
 	}
 }
@@ -81,17 +95,17 @@ async function createMaintenanceRows(spare_parts_with_costs, res, equipment, mai
 	let rows = getRowsFromQuery(spare_parts_with_costs, maintenance.id)
 
 	const maintenanceRows = await MaintenanceSparePart.bulkCreate(rows)
-	if (!rows) return res.status(400).send(ERROR_CREATING_MAINTENANCE_ROWS)
+	if (!rows) throw Utils.throwError(400, ERROR_CREATING_MAINTENANCE_ROWS)
 	const totalCost = getMaintenanceCostFromSpareParts(spare_parts_with_costs)
 	maintenance.maintenance_cost = totalCost
 	maintenance = await maintenance.save()
 	equipment.addMaintenances(maintenance)
-	Utils.successResponse(res, {
+	return {
 		message: `Maintenance ${maintenance.id} with ${maintenanceRows.length} rows created and added to equipment ${equipment.code} succesfully with a total cost of ${maintenance.maintenance_cost}.`,
 		maintenance_id: maintenance.id,
 		equipment_id: equipment.id,
 		maintenance_spare_parts: maintenanceRows
-	})
+	}
 }
 
 function getRowsFromQuery(sparePartQuery, maintenance_id) {
@@ -106,6 +120,16 @@ function getRowsFromQuery(sparePartQuery, maintenance_id) {
 		})
 	})
 	return maintenanceRows
+}
+
+async function getMaintenanceFrequency(sheet_id, frequency) {
+	return MaintenanceFrequency.findOne(
+		{
+			where: {
+				lubrication_sheet_id: sheet_id,
+				frequency: frequency
+			}
+		});
 }
 
 async function getSpareParts(sparePartQuery) {
@@ -135,7 +159,7 @@ function getPartialCostForRow(parts, sparePartQuery) {
      * @param {*} body 
      * Validates body structure
      * {
-	 *   "maintenance_frequency_id": 2,
+	 *   "maintenance_frequency": 400,
      *   "equipment_code": "EQ-01",
      *   "spare_parts": [
      *       { "spare_part_id": 22, "quantity": 3, "application": "Primary"},
@@ -147,7 +171,7 @@ function getPartialCostForRow(parts, sparePartQuery) {
      * @returns a string with an error message, or null if everything is fine
      */
   function validateBody(body) {
-	const requiredFields = ["maintenance_frequency_id", "equipment_code", "spare_parts"];
+	const requiredFields = ["maintenance_frequency", "equipment_code", "spare_parts"];
 	const sparePartFields = ["spare_part_id", "quantity", "application"];
 
 	for (const field of requiredFields) {

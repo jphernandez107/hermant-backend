@@ -59,7 +59,7 @@ const getSparePartByIdOrCode = async (req, res) => {
  async function findSpareParts(query) {
     const spareParts = await SparePart.findAll ({
         include: includes,
-        where: whereOnlyIdOrOnlyCode(query)
+        where: whereOnlyIdOrOnlyCodeList(query)
     })
     return spareParts
 }
@@ -144,6 +144,51 @@ function whereOnlyIdOrOnlyCode(query) {
 	if (externalCodes.length > 0 && externalCodes[0] !== undefined) {
 		return {
 			external_code: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('external_code')), 'LIKE', `%${externalCodes[0].toLowerCase()}%`)
+		}
+	}
+
+	return {[Op.and]: [Sequelize.literal('1 = 0')]}
+}
+
+/**
+ * 
+ * @param {*} query can contain id, internal_code and external_code
+ * 
+ * The priority is:
+ * 1. id
+ * 2. internal_code
+ * 3. external_code
+ * 
+ * @returns a where statement filtering only for one parameter
+ */
+function whereOnlyIdOrOnlyCodeList(query) {
+	let internalCodes = Array.isArray(query.internal_code) ? query.internal_code : [query.internal_code];
+	let externalCodes = Array.isArray(query.external_code) ? query.external_code : [query.external_code];
+	let ids = Array.isArray(query.id) ? query.id : [query.id];
+
+	if (ids.length > 0 && ids[0] !== undefined) {
+		return {
+			id: ids
+		}
+	}
+
+	const internal_codes = internalCodes.map((code) => {
+		return Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('internal_code')), 'LIKE', `%${code.toLowerCase()}%`)
+	})
+
+	if (internal_codes.length > 0) {
+		return {
+			internal_code: internal_codes
+		}
+	}
+
+	const external_codes = externalCodes.map((code) => {
+		return Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('internal_code')), 'LIKE', `%${code.toLowerCase()}%`)
+	})
+
+	if (external_codes.length > 0) {
+		return {
+			external_code: external_codes
 		}
 	}
 

@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
                 onDelete: 'CASCADE'
             });
             Maintenance.belongsTo(models.maintenance_frequency, {
+                as: "maintenance_frequency",
                 foreignKey: 'maintenance_frequency_id'
             });
 		}
