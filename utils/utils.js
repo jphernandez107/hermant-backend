@@ -60,8 +60,29 @@ class Utils {
             "message": message
         }
     }
+
+    
+}
+
+Array.prototype.max = function() {
+    if (this.length === 0) return undefined
+    return Math.max.apply(null, this);
+};
+
+Array.prototype.min = function() {
+    if (this.length === 0) return undefined
+    return Math.min.apply(null, this);
+};
+
+Date.prototype.addDays = function(days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
 }
 
 module.exports = {
-    Utils
+    Utils,
+    max: Array.prototype.max,
+    min: Array.prototype.min,
+    addDays: Date.prototype.addDays
 }

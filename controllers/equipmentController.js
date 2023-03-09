@@ -1,27 +1,33 @@
 const { Utils } = require('../utils/utils');
-const models = require('../ORM/models')
+const models = require('../ORM/models');
 const Equipment = models.equipment;
 const ConstructionSite = models.construction_site
 const Maintenance = models.maintenance
 const MaintenanceFrequency = models.maintenance_frequency
 const EquipmentHour = models.equipment_hour;
+const NextMaintenance = models.next_maintenance;
+const maintenanceController = require('./maintenanceController')
 
 const includes = [
     {
-      model: ConstructionSite,
-      as: 'construction_sites'
+        model: ConstructionSite,
+        as: 'construction_sites'
     },
     {
-      model: Maintenance,
-      as: 'maintenances',
-      include: [
-        {
-          model: MaintenanceFrequency,
-          as: 'maintenance_frequency'
-        }
-      ]
-    }
-  ]
+        model: Maintenance,
+        as: 'maintenances',
+        include: [
+            {
+                model: MaintenanceFrequency,
+                as: 'maintenance_frequency'
+            }
+        ]
+    },
+    {
+        model: NextMaintenance,
+        as: 'next_maintenances'
+    },
+];
 
 const EQUIPMENT_NOT_FOUND = `Equipment not found.`
 const ERROR_CREATING_EQUIPMENT = `Error creating new equipment.`
@@ -39,6 +45,11 @@ const getEquipmentsList = async (req, res) => {
             include: includes
         })
         if (!equipments) return res.status(404).send(EQUIPMENT_NOT_FOUND)
+        equipments.forEach((equipment) => {
+            const firstMaint = equipment.next_maintenances.map((maint) => new Date(maint.maintenance_date)).min()
+            const next_maintenance = firstMaint ? new Date(firstMaint) : undefined;
+            equipment.dataValues.next_maintenance = next_maintenance ? next_maintenance.toLocaleDateString() : undefined;
+        })
         return res.status(200).json(equipments)
     } catch (error) {
         catchError(res, error, EQUIPMENT_NOT_FOUND)
@@ -66,6 +77,8 @@ async function findEquipmentByIdOrCode(query) {
         include: includes,
         where: whereIdOrCode(query)
     })
+    const next_maintenance = new Date(equipment.next_maintenances.map((maint) => new Date(maint.maintenance_date)).min());
+    equipment.dataValues.next_maintenance = next_maintenance.toLocaleDateString();
     return equipment
 }
 
@@ -149,6 +162,9 @@ const addUseHours = async (req, res) => {
             partial_hours: partial
         });
         if (!equipmentUpdated) return res.status(404).send(ERROR_UPDATING_EQUIPMENT);
+
+        if (equipmentUpdated.lubrication_sheet_id)
+            await maintenanceController.updateNextMaintenancesForEquipment(equipmentUpdated);
 
         return res.status(200).json({
             message: `Equipment hour ${equipment_hour.id} added to equipment ${equipmentUpdated.code} succsesfully.`,
