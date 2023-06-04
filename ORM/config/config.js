@@ -1,12 +1,6 @@
 require('dotenv').config();
-// const { DB_HOST, DB_USERNAME, DB_PASSWORD } = process.env;
+const { DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE, DB_PORT } = process.env;
 const mysql2 = require("mysql2");
-
-const DB_HOST = 'hermant-dev.c78o0dss7yre.us-east-2.rds.amazonaws.com'
-const DB_USERNAME = 'yoojuaan'
-const DB_PASSWORD = '123456jp'
-const DB_DATABASE = 'hermantdev'
-const DB_PORT = 3306
 
 module.exports = {
   development: {
