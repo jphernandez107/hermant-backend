@@ -1,10 +1,10 @@
 require('dotenv').config();
 // const { DB_HOST, DB_USERNAME, DB_PASSWORD } = process.env;
 
-const DB_HOST = '127.0.0.1'
-const DB_USERNAME = 'root'
+const DB_HOST = 'hermant-dev.c78o0dss7yre.us-east-2.rds.amazonaws.com'
+const DB_USERNAME = 'yoojuaan'
 const DB_PASSWORD = '123456jp'
-const DB_DATABASE = 'hermant'
+const DB_DATABASE = 'hermantdev'
 const DB_PORT = 3306
 
 module.exports = {
