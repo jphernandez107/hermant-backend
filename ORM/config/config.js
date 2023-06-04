@@ -1,5 +1,6 @@
 require('dotenv').config();
 // const { DB_HOST, DB_USERNAME, DB_PASSWORD } = process.env;
+const mysql2 = require("mysql2");
 
 const DB_HOST = 'hermant-dev.c78o0dss7yre.us-east-2.rds.amazonaws.com'
 const DB_USERNAME = 'yoojuaan'
@@ -14,6 +15,7 @@ module.exports = {
     database: DB_DATABASE,
     host: DB_HOST,
     dialect: "mysql",
+    dialectModule: mysql2,
     port: DB_PORT,
     define: {
       timestamps: false,
@@ -27,6 +29,7 @@ module.exports = {
     port: DB_PORT,
     host: DB_HOST,
     dialect: "mysql",
+    dialectModule: mysql2,
     define: {
       timestamps: false,
       underscored: true
@@ -39,6 +42,7 @@ module.exports = {
     port: DB_PORT,
     host: DB_HOST,
     dialect: "mysql",
+    dialectModule: mysql2,
     define: {
       timestamps: false,
       underscored: true
