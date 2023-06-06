@@ -4,6 +4,7 @@ const constructionSiteRoute = require('./constructionSiteRoute')
 const lubricationSheetRoute = require('./lubricationSheetRoute')
 const sparePartRoute = require('./sparePartRoute')
 const maintenanceRoute = require('./maintenanceRoute')
+const userRoute = require('./userRoute')
 
 
 exports.routesMap = [
@@ -26,5 +27,9 @@ exports.routesMap = [
     {
         url: "/maintenance",
         model: maintenanceRoute
+    },
+    {
+        url: "/user",
+        model: userRoute
     },
 ]
