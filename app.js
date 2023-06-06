@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors')
-const verifyToken = require("./middleware/jwtMiddleware")
+const verifyToken = require("./middleware/jwtMiddleware").verifyToken
 const app = express()
 const port = process.env.PORT || 8080
 

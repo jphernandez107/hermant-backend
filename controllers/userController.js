@@ -89,7 +89,7 @@ const loginUser = async (req, res) => {
         user.last_login = new Date();
         await user.save();
 
-        let token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET, { expiresIn: '8h' });
+        let token = jwt.sign({ id: user.id, role: user.role }, process.env.TOKEN_SECRET, { expiresIn: '8h' });
         delete user.dataValues.password
         delete user.dataValues.password_salt
         delete user.dataValues.password_reset_token
@@ -135,6 +135,13 @@ function catchError(res, error, message) {
         error,
     });
 }
+
+const UserRole = Object.freeze({
+    ADMIN: 0,
+    ENGINEER: 1,
+    MECHANIC: 2,
+    // Add any other roles you need here
+});
 
 module.exports = {
     getUsersList,
