@@ -53,7 +53,6 @@ const updateUser = async (req, res) => {
     try {
         const user = await User.findByPk(req.params.id);
         if (!user) return res.status(404).send(USER_NOT_FOUND);
-        body.password = await bcrypt.hash(body.password, SALT_ROUNDS);
         await user.update(body);
         return res.status(200).json({
             message: USER_UPDATED,
@@ -135,13 +134,6 @@ function catchError(res, error, message) {
         error,
     });
 }
-
-const UserRole = Object.freeze({
-    ADMIN: 0,
-    ENGINEER: 1,
-    MECHANIC: 2,
-    // Add any other roles you need here
-});
 
 module.exports = {
     getUsersList,

@@ -20,31 +20,34 @@ const verifyToken = (req, res, next) => {
 
 function verifyRole(roleNeeded) {
     return function (req, res, next) {
-      const authHeader = req.header('Authorization');
-      if (!authHeader) return res.status(401).send({ auth: false, message: 'No token provided.' });
+        const authHeader = req.header('Authorization');
+        if (!authHeader) return res.status(401).send({ auth: false, message: 'No token provided.' });
 
-      
-      try {
         const token = authHeader.split(' ')[1]; // Take the token part after 'Bearer'
-        const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-        if(decoded.role !== roleNeeded) return res.status(403).send('You do not have the necessary permissions to perform this action.');
-        if (UserRole[decoded.role.toUpperCase()] > UserRole[roleNeeded]) {
-            return res.status(403).send({ auth: false, message: 'You do not have the necessary permissions to perform this action.' });
-        }
-        
-        // if everything is good, save to request for use in other routes
-        req.userId = decoded.id;
-        req.userRole = decoded.role;
-        
-        next();
-      } catch (error) {
-        console.error('Failed to authenticate token.');
-        res.status(500).send({error, message:'Failed to authenticate token.'});
-      } 
+        jwt.verify(token, process.env.TOKEN_SECRET, function(err, decoded) {
+            if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+            
+            if (UserRole[decoded.role.toUpperCase()] > roleNeeded) {
+                return res.status(403).send({ auth: false, message: 'You do not have the necessary permissions to perform this action.' });
+            }
+            // if everything is good, save to request for use in other routes
+            req.userId = decoded.id;
+            req.userRole = decoded.role;
+            
+            next();
+        });
     }
-  }
+}
+
+const UserRole = Object.freeze({
+    ADMIN: 0,
+    ENGINEER: 1,
+    MECHANIC: 2,
+    // Add any other roles you need here
+});
 
 module.exports = {
     verifyToken,
-    verifyRole
+    verifyRole,
+    UserRole,
 };

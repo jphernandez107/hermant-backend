@@ -1,26 +1,30 @@
 const express = require('express');
 const router = express.Router();
 const constructionSiteController = require('../controllers/constructionSiteController');
+const { UserRole, verifyRole } = require('../middleware/jwtMiddleware');
+
+// Only engineers can access to these routes
+const role = UserRole.ENGINEER
 
 // get list of all site
-router.get('/list', constructionSiteController.getSitesList);
+router.get('/list', verifyRole(UserRole.MECHANIC), constructionSiteController.getSitesList);
 
 // get a specific site by id or code
-router.get('/details', constructionSiteController.getSiteByIdOrCode);
+router.get('/details', verifyRole(UserRole.MECHANIC), constructionSiteController.getSiteByIdOrCode);
 
 // create a new site
-router.post('/new', constructionSiteController.postNewSite);
+router.post('/new', verifyRole(role), constructionSiteController.postNewSite);
 
 // delete a specific site
-router.delete('/delete', constructionSiteController.deleteSite);
+router.delete('/delete', verifyRole(UserRole.ADMIN), constructionSiteController.deleteSite);
 
 // update a specific site
-router.put('/edit', constructionSiteController.updateSite);
+router.put('/edit', verifyRole(role), constructionSiteController.updateSite);
 
 // add equipment to site
-router.put('/equipment/add', constructionSiteController.addEquipmentToSite)
+router.put('/equipment/add', verifyRole(role), constructionSiteController.addEquipmentToSite)
 
 // remove equipment from site
-router.put('/equipment/remove', constructionSiteController.removeEquipmentFromSite)
+router.put('/equipment/remove', verifyRole(role), constructionSiteController.removeEquipmentFromSite)
 
 module.exports = router;
