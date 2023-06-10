@@ -42,7 +42,12 @@ module.exports = (sequelize, DataTypes) => {
 				]
 			},
 			{
-				association: 'next_maintenances'
+				association: 'next_maintenances',
+				include: [
+					{
+						association: 'maintenance_frequency'
+					}
+				]
 			},
 		];
 	}
