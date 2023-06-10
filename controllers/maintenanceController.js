@@ -47,7 +47,7 @@ const createMaintenance = async (req, res) => {
 	let maintenance_date = body.maintenance_date
 		? body.maintenance_date
 		: new Date();
-	let reset_equipment_partial_hours = body.reset_equipment_partial_hours
+	let reset_equipment_partial_hours = body.reset_equipment_partial_hours !== undefined
 		? body.reset_equipment_partial_hours
 		: true;
 
@@ -92,9 +92,8 @@ const createMaintenance = async (req, res) => {
 			maintenance
 		);
 		if (reset_equipment_partial_hours) {
-			await equipment.update({
-				partial_hours: 0,
-			});
+			equipment.partial_hours = 0;
+			await equipment.save();
 		}
 		Utils.successResponse(res, successResponse);
 		await transaction.commit();
