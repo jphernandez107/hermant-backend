@@ -4,7 +4,7 @@ const MaintenanceSparePart = models.maintenance_spare_part;
 const MaintenanceFrequency = models.maintenance_frequency;
 const NextMaintenance = models.next_maintenance;
 const EquipmentHour = models.equipment_hour;
-const commonController = require("./commonController").default;
+const commonController = require("./commonController");
 const equipmentController = require("./equipmentController");
 const sparePartController = require("./sparePartController");
 
@@ -103,22 +103,6 @@ const createMaintenance = async (req, res) => {
 		catchError(res, error, ERROR_CREATING_MAINTENANCE);
 	}
 };
-
-function whereIdOrCode(query) {
-	console.log(query);
-	let where = {};
-	if (query.code !== undefined) {
-		where = {
-			code: query.code,
-		};
-		return where;
-	} else {
-		where = {
-			id: query.id,
-		};
-		return where;
-	}
-}
 
 async function createMaintenanceRows(
 	spare_parts_with_costs,
