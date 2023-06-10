@@ -13,6 +13,23 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: "lubrication_sheet_id"
 			})
 		}
+
+		static includes = [
+			{
+				association: 'equipments'
+			},
+			{
+				association: 'lubrication_sheet_spare_parts',
+				include: [
+					{
+						association: 'spare_part'
+					},
+					{
+						association: 'frequencies'
+					}
+				]
+			}
+		]
 	}
 	LubricationSheet.init({
 		id: {

@@ -1,6 +1,5 @@
 'use strict';
 const { Model, Sequelize } = require('sequelize');
-const ConstructionSite = require('./construction_site')
 
 module.exports = (sequelize, DataTypes) => {
 	class Equipment extends Model {
@@ -26,6 +25,26 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: "equipment_id"
 			})
 		}
+
+		static includes = [
+			{
+				association: 'construction_sites'
+			},
+			{
+				association: 'lubrication_sheet'
+			},
+			{
+				association: 'maintenances',
+				include: [
+					{
+						association: 'maintenance_frequency'
+					}
+				]
+			},
+			{
+				association: 'next_maintenances'
+			},
+		];
 	}
 	Equipment.init({
 		id: {

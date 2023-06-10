@@ -4,12 +4,13 @@ const MaintenanceSparePart = models.maintenance_spare_part;
 const MaintenanceFrequency = models.maintenance_frequency;
 const NextMaintenance = models.next_maintenance;
 const EquipmentHour = models.equipment_hour;
+const commonController = require("./commonController").default;
 const equipmentController = require("./equipmentController");
 const sparePartController = require("./sparePartController");
 
 const { Utils } = require("../utils/utils");
 
-const uts = require("../utils/utils")
+const uts = require("../utils/utils");
 
 const MAINTENANCE_NOT_FOUND = `Maintenance not found.`;
 const FREQUENCY_NOT_FOUND = `Maintenance frequency not found.`;
@@ -52,7 +53,7 @@ const createMaintenance = async (req, res) => {
 
 	const transaction = await Maintenance.sequelize.transaction();
 	try {
-		const equipment = await equipmentController.findEquipmentByIdOrCode(
+		const equipment = await commonController.findEquipmentByIdOrCode(
 			equipmentQuery
 		);
 		if (!equipment)
@@ -199,16 +200,26 @@ async function updateNextMaintenancesForEquipment(equipment) {
 		},
 	});
 
-	if (equipmentHours) 
-		averageUseHours = getAverageUseHours(equipmentHours);
+	if (equipmentHours) averageUseHours = getAverageUseHours(equipmentHours);
 
 	const lubrication_sheet_id = equipment.lubrication_sheet_id;
-	const maintenance_frequencies = await findMaintenanceFrequenciesForLubricationSheet(lubrication_sheet_id);
-	if (!maintenance_frequencies) Utils.throwError(404, `Frequencies not found.`);
-	
+	const maintenance_frequencies =
+		await findMaintenanceFrequenciesForLubricationSheet(
+			lubrication_sheet_id
+		);
+	if (!maintenance_frequencies)
+		Utils.throwError(404, `Frequencies not found.`);
 
-	const next_maintenances = getNextMaintenances(maintenance_frequencies, equipment, averageUseHours);
-	if (!next_maintenances) Utils.throwError(500, `Error trying to calculate the next maintenance dates.`);
+	const next_maintenances = getNextMaintenances(
+		maintenance_frequencies,
+		equipment,
+		averageUseHours
+	);
+	if (!next_maintenances)
+		Utils.throwError(
+			500,
+			`Error trying to calculate the next maintenance dates.`
+		);
 	await NextMaintenance.bulkCreate(next_maintenances);
 }
 
@@ -226,24 +237,33 @@ async function findMaintenanceFrequenciesForLubricationSheet(
 function getAverageUseHours(equipmentHours) {
 	const currentDate = new Date();
 	const thirtyDaysAgo = new Date(
-	  currentDate.getTime() - 30 * 24 * 60 * 60 * 1000
+		currentDate.getTime() - 30 * 24 * 60 * 60 * 1000
 	);
-	
+
 	const dailyHours = new Map();
 	equipmentHours.forEach((useHour) => {
-	  if (useHour.date >= thirtyDaysAgo) {
-		const dateStr = useHour.date.toISOString().slice(0, 10);
-        dailyHours.set(dateStr, (dailyHours.get(dateStr) || 0) + useHour.hours_to_add);
-	  }
+		if (useHour.date >= thirtyDaysAgo) {
+			const dateStr = useHour.date.toISOString().slice(0, 10);
+			dailyHours.set(
+				dateStr,
+				(dailyHours.get(dateStr) || 0) + useHour.hours_to_add
+			);
+		}
 	});
-	
+
 	const dailyHoursArray = Array.from(dailyHours.values());
 	const totalHours = dailyHoursArray.reduce((acc, hours) => acc + hours, 0);
 	return Math.ceil(totalHours / dailyHoursArray.length);
 }
 
-function getNextMaintenances(maintenance_frequencies, equipment, averageUseHours) {
-	const frequencies = maintenance_frequencies.map((freq) => freq.frequency).sort((a, b) => a - b);
+function getNextMaintenances(
+	maintenance_frequencies,
+	equipment,
+	averageUseHours
+) {
+	const frequencies = maintenance_frequencies
+		.map((freq) => freq.frequency)
+		.sort((a, b) => a - b);
 	if (!frequencies || frequencies.length <= 0) return;
 	const NUMBER_OF_MAINTENANCES_TO_CREATE = 10;
 
@@ -252,8 +272,8 @@ function getNextMaintenances(maintenance_frequencies, equipment, averageUseHours
 	const rotatedFrequencies = frequencies
 		.slice(startIndex)
 		.concat(frequencies.slice(0, startIndex));
-	
-	const maxFreq = maintenance_frequencies.max(); 
+
+	const maxFreq = maintenance_frequencies.max();
 	const next_maintenances = [];
 
 	let nextMaint = 0;
@@ -269,7 +289,6 @@ function getNextMaintenances(maintenance_frequencies, equipment, averageUseHours
 		const daysToNextMaint = hoursToNextMaint / averageUseHours;
 		const today = new Date();
 		const nextMaintenanceDate = today.addDays(daysToNextMaint);
-		
 
 		const freqId = maintenance_frequencies.find(
 			(f) => parseInt(f.frequency) === parseInt(frequency)
