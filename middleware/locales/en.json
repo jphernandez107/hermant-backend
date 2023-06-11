@@ -1,0 +1,16 @@
+{
+	"EQUIPMENT_NOT_FOUND": "Equipment not found.",
+	"ERROR_CREATING_EQUIPMENT": "Error creating new equipment.",
+	"EQUIPMENT_DELETED": "{{equipment}} deleted successfully.",
+	"EQUIPMENT_CREATED": "{{equipment}} added successfully.",
+	"EQUIPMENT_UPDATED": "{{equipment}} updated successfully.",
+	"ERROR_CREATING_EQUIPMENT_HOUR": "Error creating new equipment hour.",
+	"CANNOT_ADD_NEGATIVE_HOURS": "Cannot add negative use hours.",
+	"ERROR_UPDATING_EQUIPMENT": "Error updating equipment.",
+    "ERROR_DELETING_EQUIPMENT": "Error deleting equipment.",
+    "EQUIPMENT_HOUR_ADDED": "Added {{equipmentHours}} hours to {{equipment}} successfully.",
+	"ERROR_ADDING_HOURS": "Error trying to add use hours to equipment.",
+	"ERROR_ADDING_LUBRICATION_SHEET": "Error trying to add lubrication sheet to equipment.",
+	"LUBRICATION_SHEET_NOT_FOUND": "Lubrication sheet not found.",
+    "EQUIPMENT_ADDED_TO_LUBRICATION_SHEET": "Lubrication sheet successfully linked to {{equipment}}."
+}

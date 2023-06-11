@@ -1,0 +1,16 @@
+{
+	"EQUIPMENT_NOT_FOUND": "Equipo no encontrado.",
+	"ERROR_CREATING_EQUIPMENT": "Ocurrió un error creando el equipo.",
+	"EQUIPMENT_DELETED": "{{equipment}} eliminado correctamente.",
+	"EQUIPMENT_CREATED": "{{equipment}} creado correctamente.",
+	"EQUIPMENT_UPDATED": "{{equipment}} actualizado correctamente.",
+	"ERROR_CREATING_EQUIPMENT_HOUR": "Ocurrió un error creando horas de uso.",
+	"CANNOT_ADD_NEGATIVE_HOURS": "No debe agregar horas con valores negativos.",
+	"ERROR_UPDATING_EQUIPMENT": "Ocurrió un error actualizando el equipo.",
+    "ERROR_DELETING_EQUIPMENT": "Ocurrió un error eliminando el equipo..",
+    "EQUIPMENT_HOUR_ADDED": "Se agregaron {{equipmentHours}}hs al equipo {{equipment}} correctamente.",
+	"ERROR_ADDING_HOURS": "Ocurrió un error agregando horas al equipo.",
+	"ERROR_ADDING_LUBRICATION_SHEET": "Ocurrió un error tratando de agregar una planilla de lubricación al equipo.",
+	"LUBRICATION_SHEET_NOT_FOUND": "Planilla de lubricación no encontrada.",
+    "EQUIPMENT_ADDED_TO_LUBRICATION_SHEET": "Planilla de lubricación vinculada correctamente al equipo {{equipment}}."
+}

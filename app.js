@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const verifyToken = require("./middleware/jwtMiddleware").verifyToken
+const i18n = require("./middleware/i18n")
 const app = express()
 const port = process.env.PORT || 8080
 
@@ -24,6 +25,17 @@ app.use(cors({
   credentials: true,
 }));
 app.use(verifyToken)
+
+app.use(i18n.init);
+app.use((req, res, next) => {
+	const locale = req.acceptsLanguages('es', 'en');
+	if (i18n.getLocales().includes(locale)) {
+		i18n.setLocale(locale);
+	} else {
+		i18n.setLocale("es");
+	}
+    next();
+});
 
 routes.routesMap.forEach((route) => {
 	app.use(route.url, route.model)
