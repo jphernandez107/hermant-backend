@@ -27,4 +27,10 @@ router.post("/hours", verifyRole(role), equipmentController.addUseHours);
 // // add lubrication sheet to a specific equipment
 router.put( "/lubricationsheet/add", verifyRole(role), equipmentController.addLubricationSheetToEquipment);
 
+// add equipment to site
+router.put('/site/add', verifyRole(role), equipmentController.addEquipmentToSite)
+
+// remove equipment from site
+router.put('/site/remove', verifyRole(role), equipmentController.removeEquipmentFromSite)
+
 module.exports = router;

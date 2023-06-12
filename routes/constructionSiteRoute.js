@@ -21,10 +21,4 @@ router.delete('/delete', verifyRole(UserRole.ADMIN), constructionSiteController.
 // update a specific site
 router.put('/edit', verifyRole(role), constructionSiteController.updateSite);
 
-// add equipment to site
-router.put('/equipment/add', verifyRole(role), constructionSiteController.addEquipmentToSite)
-
-// remove equipment from site
-router.put('/equipment/remove', verifyRole(role), constructionSiteController.removeEquipmentFromSite)
-
 module.exports = router;

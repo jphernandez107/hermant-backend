@@ -1,5 +1,5 @@
 const i18n = require("i18n");
-const { findEquipmentByIdOrCode, findLubricationSheetById } = require("./commonController");
+const { findEquipmentByIdOrCode, findSiteByIdOrCode, findLubricationSheetById } = require("./commonController");
 const maintenanceController = require("./maintenanceController");
 const models = require("../ORM/models");
 const { Utils } = require("../utils/utils");
@@ -113,8 +113,8 @@ const addUseHours = async (req, res) => {
 		if (!equipment) 
             return catchError(res, null, 404, i18n.__("EQUIPMENT_NOT_FOUND"));
 
-		const site = equipment.construction_sites[0];
-		equipmentHourBody = appendAdditionalEquipmentData(equipmentHourBody, equipment, site);
+		const site = equipment.construction_site;
+		equipmentHourBody = appendAdditionalEquipmentData(equipmentHourBody, equipment);
 
 		const equipment_hour = await EquipmentHour.create(equipmentHourBody);
 
@@ -158,9 +158,8 @@ const processEquipmentHourBody = (body) => ({
 	user_id: body.user_id || 0,
 });
 
-const appendAdditionalEquipmentData = (equipmentHourBody, equipment, site) => {
+const appendAdditionalEquipmentData = (equipmentHourBody, equipment) => {
 	equipmentHourBody.equipment_id = equipment.id;
-	equipmentHourBody.construction_site_id = site ? site.id : null;
 	equipmentHourBody.total_hours = equipment.total_hours;
 	equipmentHourBody.partial_hours = equipment.partial_hours;
 
@@ -200,6 +199,91 @@ const addLubricationSheetToEquipment = async (req, res) => {
 	}
 };
 
+const addEquipmentToSite = async (req, res) => {
+	let body = req.body;
+	let siteQuery = {
+		id: body.site_id,
+		code: body.site_code,
+	};
+	let equipmentQuery = {
+		id: body.equipment_id,
+		code: body.equipment_code,
+	};
+	try {
+		const equipment = await findEquipmentByIdOrCode(
+			equipmentQuery
+		);
+		if (!equipment)
+			return catchError(res, null, 404, i18n.__("EQUIPMENT_NOT_FOUND"));
+
+		let site = await findSiteByIdOrCode(siteQuery);
+		    if (!site) catchError(res, null, 404, i18n.__("SITE_NOT_FOUND"));
+            
+        equipment.construction_site_id = site.id; 
+		await equipment.save();
+
+        site = await findSiteByIdOrCode(siteQuery);
+		    if (!site) catchError(res, null, 404, i18n.__("SITE_NOT_FOUND"));
+
+        const allEquipments = await Equipment.findAll({
+			include: Equipment.includes,
+		});
+
+        const message = i18n.__("EQUIPMENT_ADDED_TO_SITE", {
+            site: `${site.name} ${site.code}`,
+            equipment: getEquipmentMessage(equipment)
+        });
+		return res.status(200).json({
+			message: message,
+			site: site,
+			equipment: equipment,
+            all_equipments: allEquipments
+		});
+	} catch (error) {
+		catchError(res, error, 500, i18n.__("ERROR_ADDING_EQUIPMENT_TO_SITE"));
+	}
+};
+
+const removeEquipmentFromSite = async (req, res) => {
+	let body = req.body;
+	let siteQuery = {
+		id: body.site_id,
+		code: body.site_code,
+	};
+	let equipmentQuery = {
+		id: body.equipment_id,
+		code: body.equipment_code,
+	};
+	try {
+		const equipment = await findEquipmentByIdOrCode(
+			equipmentQuery
+		);
+		if (!equipment)
+			return catchError(res, null, 404, i18n.__("EQUIPMENT_NOT_FOUND"));
+
+		let site = await findSiteByIdOrCode(siteQuery);
+		    if (!site) catchError(res, null, 404, i18n.__("SITE_NOT_FOUND"));
+
+        const principalSite = await findSiteByIdOrCode({code: "T01"});
+        equipment.construction_site_id = principalSite.id || null; 
+        await equipment.save();
+
+        site = await findSiteByIdOrCode(siteQuery);
+		    if (!site) catchError(res, null, 404, i18n.__("SITE_NOT_FOUND"));
+
+        const message = i18n.__("EQUIPMENT_REMOVED_FROM_SITE", {
+            equipment: getEquipmentMessage(equipment)
+        });
+		return res.status(200).json({
+			message: message,
+			site: site,
+			equipment: equipment,
+		});
+	} catch (error) {
+		catchError(res, error, 500, i18n.__("ERROR_REMOVING_EQUIPMENT_FROM_SITE"));
+	}
+};
+
 module.exports = {
 	getEquipmentsList,
 	getEquipmentByIdOrCode,
@@ -208,4 +292,6 @@ module.exports = {
 	updateEquipment,
 	addUseHours,
 	addLubricationSheetToEquipment,
+    addEquipmentToSite,
+    removeEquipmentFromSite,
 };

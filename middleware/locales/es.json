@@ -12,5 +12,11 @@
 	"ERROR_ADDING_HOURS": "Ocurrió un error agregando horas al equipo.",
 	"ERROR_ADDING_LUBRICATION_SHEET": "Ocurrió un error tratando de agregar una planilla de lubricación al equipo.",
 	"LUBRICATION_SHEET_NOT_FOUND": "Planilla de lubricación no encontrada.",
-    "EQUIPMENT_ADDED_TO_LUBRICATION_SHEET": "Planilla de lubricación vinculada correctamente al equipo {{equipment}}."
+    "EQUIPMENT_ADDED_TO_LUBRICATION_SHEET": "Planilla de lubricación vinculada correctamente al equipo {{equipment}}.",
+    "EQUIPMENT_ADDED_TO_SITE": "{{equipment}} agregado a la obra {{site}} correctamente.",
+    "ERROR_ADDING_EQUIPMENT_TO_SITE": "Ocurrió un error agregando el equipo a la obra.",
+    "EQUIPMENT_REMOVED_FROM_SITE": "Se quitó el equipo {{equipment}} de la obra correctamente.",
+    "ERROR_REMOVING_EQUIPMENT_FROM_SITE": "Ocurrió un error quitando el equipo de la obra.",
+
+    "SITE_NOT_FOUND": "Obra no encontrada."
 }

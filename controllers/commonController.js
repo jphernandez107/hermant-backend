@@ -1,6 +1,7 @@
 const models = require('../ORM/models');
 const Equipment = models.equipment;
 const LubricationSheet = models.lubrication_sheet;
+const ConstructionSite = models.construction_site;
 
 /**
  * Finds a single equipment record based on the query parameters.
@@ -15,7 +16,21 @@ async function findEquipmentByIdOrCode(query) {
     });
     const next_maintenance = new Date(equipment.next_maintenances.map((maint) => new Date(maint.maintenance_date)).min());
     equipment.dataValues.next_maintenance = next_maintenance.toLocaleDateString();
-    return equipment
+    return equipment;
+}
+
+/**
+ * Finds a single site record based on the query parameters.
+ * 
+ * @param {Object} query Example: code=T01&id=2
+ * @returns {Equipment} equipment - A single equipment record from database
+ */
+async function findSiteByIdOrCode(query) {
+    const site = await ConstructionSite.findOne ({
+        include: ConstructionSite.includes,
+        where: whereIdOrCode(query)
+    });
+    return site;
 }
 
 /**
@@ -29,7 +44,7 @@ async function findLubricationSheetById(query) {
         include: LubricationSheet.includes,
         where: whereIdOrCode(query)
     })
-    return lubricationSheet
+    return lubricationSheet;
 }
 
 function whereIdOrCode(query) {
@@ -50,5 +65,6 @@ function whereIdOrCode(query) {
 
 module.exports = {
     findEquipmentByIdOrCode,
+    findSiteByIdOrCode,
     findLubricationSheetById,
 }

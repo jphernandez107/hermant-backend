@@ -4,11 +4,10 @@ const { Model, Sequelize } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
 	class Equipment extends Model {
 		static associate(models) {
-			Equipment.belongsToMany(models.construction_site, {
-				through: models.equipment_construction_site,
-				as: 'construction_sites',
-				foreignKey: "equipment_id"
-			})
+			Equipment.belongsTo(models.construction_site, {
+				as: 'construction_site',
+				foreignKey: 'construction_site_id',
+			  });
 			Equipment.belongsTo(models.lubrication_sheet, {
 				as: 'lubrication_sheet'
 			})
@@ -28,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
 
 		static includes = [
 			{
-				association: 'construction_sites'
+				association: 'construction_site'
 			},
 			{
 				association: 'lubrication_sheet'
@@ -105,6 +104,13 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		site_importance: {
 			type: DataTypes.INTEGER
+		},
+		construction_site_id: {
+			type: DataTypes.INTEGER,
+			references: {
+				model: 'construction_site',
+				key: 'id'
+			}
 		},
 		lubrication_sheet_id: {
 			type: DataTypes.INTEGER,

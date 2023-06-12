@@ -4,12 +4,27 @@ const { Model, Sequelize } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
 	class ConstructionSite extends Model {
 		static associate(models) {
-			ConstructionSite.belongsToMany(models.equipment, {
-				through: models.equipment_construction_site,
+			ConstructionSite.hasMany(models.equipment, {
 				as: 'equipments',
-				foreignKey: "construction_site_id"
-			})
+				foreignKey: 'construction_site_id',
+			});
 		}
+
+		static includes = [
+			{
+				association: "equipments",
+				include: [
+					{
+						association: 'next_maintenances',
+						include: [
+							{
+								association: 'maintenance_frequency'
+							}
+						]
+					}
+				]
+			},
+		]
 	}
 	ConstructionSite.init({
 		id: {
