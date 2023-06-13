@@ -13,6 +13,22 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: "spare_part_id"
 			})
 		}
+
+		static includes = [
+			{
+				association: 'lubrication_sheet_spare_parts',
+				include: [
+					{
+						association: 'lubrication_sheet',
+						include: [
+							{
+								association: 'equipments'
+							}
+						]
+					}
+				]
+			}
+		];
 	}
 	SparePart.init({
 		id: {

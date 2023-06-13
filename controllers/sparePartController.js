@@ -17,12 +17,13 @@ const includes = []
 const getSparePartList = async (req, res) => {
 	try {
 		const parts = await SparePart.findAll({
-			where: whereIdOrCode(req.query)
-		})
-		if (!parts) return res.status(404).send(PART_NOT_FOUND)
-		return res.status(200).json(parts)
+			where: whereIdOrCode(req.query),
+			include: SparePart.includes
+		});
+		if (!parts) return res.status(404).send(PART_NOT_FOUND);
+		return res.status(200).json(parts);
  	} catch (error) {
-		catchError(res, error, PART_NOT_FOUND)
+		catchError(res, error, PART_NOT_FOUND);
 	}
 }
 
