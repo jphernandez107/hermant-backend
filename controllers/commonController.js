@@ -28,6 +28,9 @@ async function findEquipmentByIdOrCode(query) {
 async function findSiteByIdOrCode(query) {
     const site = await ConstructionSite.findOne ({
         include: ConstructionSite.includes,
+        order: [
+            ['equipments', 'code', 'desc']
+        ],
         where: whereIdOrCode(query)
     });
     return site;

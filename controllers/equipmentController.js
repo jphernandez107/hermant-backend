@@ -18,6 +18,9 @@ const getEquipmentsList = async (req, res) => {
 	try {
 		const equipments = await Equipment.findAll({
 			include: Equipment.includes,
+			order: [
+				['code', 'DESC']
+			]
 		});
 		if (!equipments) 
             return catchError(res, null, 404, i18n.__("EQUIPMENT_NOT_FOUND"));
@@ -227,6 +230,9 @@ const addEquipmentToSite = async (req, res) => {
 
         const allEquipments = await Equipment.findAll({
 			include: Equipment.includes,
+			order: [
+				['code', 'DESC']
+			]
 		});
 
         const message = i18n.__("EQUIPMENT_ADDED_TO_SITE", {
