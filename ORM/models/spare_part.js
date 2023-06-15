@@ -38,7 +38,6 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		internal_code: {
 			type: DataTypes.STRING,
-			unique: true,
 			allowNull: false
 		},
 		external_code: {
