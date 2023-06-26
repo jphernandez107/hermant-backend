@@ -23,6 +23,7 @@ router.put("/edit", verifyRole(role), equipmentController.updateEquipment);
 
 // add use hours to equipment
 router.post("/hours", verifyRole(role), equipmentController.addUseHours);
+router.post("/hours/bulk", verifyRole(role), equipmentController.addUseHoursInBulk);
 
 // // add lubrication sheet to a specific equipment
 router.put( "/lubricationsheet/add", verifyRole(role), equipmentController.addLubricationSheetToEquipment);

@@ -154,20 +154,97 @@ const addUseHours = async (req, res) => {
 	}
 };
 
+const addUseHoursInBulk = async (req, res) => {
+	const { hours: hoursToAdd, start_date, end_date, user_id } = req.body;
+	if (!hoursToAdd || !start_date || !end_date) {
+		return catchError(res, null, 400, i18n.__("INVALID_INPUT"));
+	}
+	const startDate = new Date(start_date);
+	const endDate = new Date(end_date);
+	const diffDays = Math.round((endDate - startDate) / 1000 / 60 / 60 / 24); // Diff days to calculate hours per day.
+
+	try {
+		const equipments = await Equipment.findAll();
+		if (!equipments) 
+			return catchError(res, null, 404, i18n.__("EQUIPMENT_NOT_FOUND"));
+
+		const errorsCreatingUseHours = [];
+		const equipmentsSuccessfullyModified = [];
+		for (let equipmentHour of hoursToAdd) {
+			const equipment = equipments.find(eq => eq.code === equipmentHour.code);
+			if (!equipment) {
+				errorsCreatingUseHours.push(equipmentHour.code);
+				continue;
+			}
+
+			const dailyUseHours = equipmentHour.hours / diffDays;
+			for (let i = 0; i < diffDays; i++) {
+				const date = new Date(startDate);
+				date.setDate(date.getDate() + i);
+				const useHourBody = appendAdditionalEquipmentData({
+					hours_to_add: parseInt(dailyUseHours),
+					date: date,
+					observations: `Added in bulk from date: ${startDate} to date: ${endDate}. On date: ${new Date()}`,
+					user_id: user_id,
+				}, equipment);
+				const equipment_hour = await EquipmentHour.create(useHourBody);
+				if (!equipment_hour) {
+					errorsCreatingUseHours.push(equipment.code);
+					continue;
+				} else {
+					equipment.partial_hours += equipment_hour.hours_to_add;
+					equipment.total_hours += equipment_hour.hours_to_add;
+				}
+			}
+			await equipment.save();
+			equipmentsSuccessfullyModified.push(equipment);
+			if (equipment.lubrication_sheet_id)
+				maintenanceController.updateNextMaintenancesForEquipment(equipment);
+		}
+		const message = equipmentHoursBulkAddedMessage(equipmentsSuccessfullyModified, errorsCreatingUseHours);
+		const statusCode = errorsCreatingUseHours.length > 0 ? 500 : 200;
+		return res.status(statusCode).json({
+			message: message,
+			equipments: equipments,
+		});
+	} catch (error) {
+		catchError(res, error, 500, i18n.__("ERROR_ADDING_HOURS"));
+	}
+}
+
 const processEquipmentHourBody = (body) => ({
 	hours_to_add: parseInt(body.hours_to_add),
 	date: body.date,
-	observations: body.observations,
-	user_id: body.user_id || 0,
+	observations: body.observations || "",
+	user_id: body.user_id || -1,
 });
 
 const appendAdditionalEquipmentData = (equipmentHourBody, equipment) => {
 	equipmentHourBody.equipment_id = equipment.id;
 	equipmentHourBody.total_hours = equipment.total_hours;
 	equipmentHourBody.partial_hours = equipment.partial_hours;
+	equipmentHourBody.construction_site_id = equipment.construction_site_id;
 
 	return equipmentHourBody;
 };
+
+const equipmentHoursBulkAddedMessage = (equipments, errors) => {
+	const successMessage = i18n.__("EQUIPMENT_HOUR_BULK_ADDED", {
+		equipments: equipments.map(eq => eq.dataValues.code).join(", ")
+	});
+	if (!errors && equipments && equipments.length > 0) 
+		return successMessage;
+	
+	const uniqueErrors = [... new Set(errors)];
+	const errorMessage = i18n.__("ERROR_ADDING_HOURS_TO_EQUIPMENTS", {
+		errorEquipments: uniqueErrors.join(", ")
+	});
+
+	if (!equipments || equipments.length === 0)
+		return errorMessage;
+
+	return `${errorMessage} ${successMessage}`;
+}
 
 const addLubricationSheetToEquipment = async (req, res) => {
 	try {
@@ -300,4 +377,5 @@ module.exports = {
 	addLubricationSheetToEquipment,
     addEquipmentToSite,
     removeEquipmentFromSite,
+	addUseHoursInBulk,
 };

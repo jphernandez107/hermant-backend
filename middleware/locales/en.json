@@ -9,6 +9,8 @@
 	"ERROR_UPDATING_EQUIPMENT": "Error updating equipment.",
     "ERROR_DELETING_EQUIPMENT": "Error deleting equipment.",
     "EQUIPMENT_HOUR_ADDED": "Added {{equipmentHours}} hours to {{equipment}} successfully.",
+	"EQUIPMENT_HOUR_BULK_ADDED": "Added use hours successfully to equipments with code: {{equipments}}.",
+	"ERROR_ADDING_HOURS_TO_EQUIPMENTS": "Error adding use hours to equipments with code: {{errorEquipments}}.",
 	"ERROR_ADDING_HOURS": "Error trying to add use hours to equipment.",
 	"ERROR_ADDING_LUBRICATION_SHEET": "Error trying to add lubrication sheet to equipment.",
 	"LUBRICATION_SHEET_NOT_FOUND": "Lubrication sheet not found.",
@@ -17,6 +19,7 @@
     "ERROR_ADDING_EQUIPMENT_TO_SITE": "Error trying to add equipment to site.",
     "EQUIPMENT_REMOVED_FROM_SITE": "{{equipment}} removed from site successfully.",
     "ERROR_REMOVING_EQUIPMENT_FROM_SITE": "Error trying to remove equipment from site.",
+	"INVALID_INPUT": "Missing parameters.",
 
     "SITE_NOT_FOUND": "Construction Site not found."
 }
