@@ -178,6 +178,7 @@ const addUseHoursInBulk = async (req, res) => {
 			}
 
 			const dailyUseHours = equipmentHour.hours / diffDays;
+			let equipmentHoursToAdd = [];
 			for (let i = 0; i < diffDays; i++) {
 				const date = new Date(startDate);
 				date.setDate(date.getDate() + i);
@@ -187,19 +188,20 @@ const addUseHoursInBulk = async (req, res) => {
 					observations: `Added in bulk from date: ${startDate} to date: ${endDate}. On date: ${new Date()}`,
 					user_id: user_id,
 				}, equipment);
-				const equipment_hour = await EquipmentHour.create(useHourBody);
-				if (!equipment_hour) {
-					errorsCreatingUseHours.push(equipment.code);
-					continue;
-				} else {
-					equipment.partial_hours += equipment_hour.hours_to_add;
-					equipment.total_hours += equipment_hour.hours_to_add;
-				}
+				equipmentHoursToAdd.push(useHourBody)
+				equipment.partial_hours += useHourBody.hours_to_add;
+				equipment.total_hours += useHourBody.hours_to_add;
 			}
-			await equipment.save();
-			equipmentsSuccessfullyModified.push(equipment);
-			if (equipment.lubrication_sheet_id)
-				maintenanceController.updateNextMaintenancesForEquipment(equipment);
+
+			try {
+				await EquipmentHour.bulkCreate(equipmentHoursToAdd);
+				equipmentsSuccessfullyModified.push(equipment);
+				await equipment.save();
+				if (equipment.lubrication_sheet_id)
+					maintenanceController.updateNextMaintenancesForEquipment(equipment);
+			} catch (error) {
+				errorsCreatingUseHours.push(equipment.code);
+			}
 		}
 		const message = equipmentHoursBulkAddedMessage(equipmentsSuccessfullyModified, errorsCreatingUseHours);
 		const statusCode = errorsCreatingUseHours.length > 0 ? 500 : 200;
