@@ -223,7 +223,11 @@ async function linkMaintenanceFrequenciesToLubricationSheetSpareParts(
 			part.frequencies.includes(freq.frequency)
 		);
 		sheet_rows
-			.find((row) => row.spare_part_id === part.spare_part_id)
+			.find((row) => {
+				return row.spare_part_id === part.spare_part_id
+					&& row.application === part.application
+					&& row.quantity === part.quantity
+			})
 			.addFrequencies(freqs);
 	});
 }
