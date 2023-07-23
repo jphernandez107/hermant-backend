@@ -136,7 +136,7 @@ const addUseHours = async (req, res) => {
 			return catchError(res, null, 500, ERROR_UPDATING_EQUIPMENT);
 
 		if (equipmentUpdated.lubrication_sheet_id)
-			await maintenanceController.updateNextMaintenancesForEquipment(equipmentUpdated);
+			maintenanceController.updateNextMaintenancesForEquipment([equipmentUpdated]);
 
         const message = i18n.__("EQUIPMENT_HOUR_ADDED", {
             equipmentHours: `${equipment_hour.hours_to_add}`,
@@ -197,12 +197,11 @@ const addUseHoursInBulk = async (req, res) => {
 				await EquipmentHour.bulkCreate(equipmentHoursToAdd);
 				equipmentsSuccessfullyModified.push(equipment);
 				await equipment.save();
-				if (equipment.lubrication_sheet_id)
-					maintenanceController.updateNextMaintenancesForEquipment(equipment);
 			} catch (error) {
 				errorsCreatingUseHours.push(equipment.code);
 			}
 		}
+		maintenanceController.updateNextMaintenancesForEquipment(equipmentsSuccessfullyModified);
 		const message = equipmentHoursBulkAddedMessage(equipmentsSuccessfullyModified, errorsCreatingUseHours);
 		const statusCode = errorsCreatingUseHours.length > 0 ? 500 : 200;
 		return res.status(statusCode).json({

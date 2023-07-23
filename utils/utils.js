@@ -61,6 +61,11 @@ class Utils {
         }
     }
 
+    static validateDate(date) {
+        const d = new Date(date);
+        return !isNaN(d.getTime());
+    }
+
     
 }
 

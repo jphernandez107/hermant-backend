@@ -3,6 +3,7 @@ const LubricationSheet = models.lubrication_sheet;
 const LubricationSheetSparePart = models.lubrication_sheet_spare_part;
 const MaintenanceFrequency = models.maintenance_frequency;
 const commonController = require("./commonController");
+const maintenanceController = require("./maintenanceController");
 
 const { Utils } = require("../utils/utils");
 
@@ -165,6 +166,7 @@ const addSparePartToLubricationSheet = async (req, res) => {
 			frequencies,
 			sheetRows
 		);
+		maintenanceController.updateNextMaintenancesForEquipment(sheet.equipments);
 		sheet.addEquipments(equipment);
 		return Utils.successResponse(res, {
 			message: `Lubrication Sheet ${sheet.id} with ${sheetRows.length} rows created and added to equipment ${equipment.code} succesfully.`,
@@ -181,15 +183,20 @@ const addSparePartToLubricationSheet = async (req, res) => {
 
 async function clearLubricationSheet(sheetQuery) {
 	try {
-		const sheet = await findOrCreateLubricationSheet(sheetQuery);
-		if (!sheet) return;
-		await Promise.all(sheet.lubrication_sheet_spare_parts.map(async (row) => {
-			await Promise.all(row.frequencies.map(freq => freq.destroy()));
-			await row.destroy();
-		}));
+		await maintenanceController.removeMaintenanceFrequenciesForLubricationSheetId(sheetQuery.id);
+		await removeLubricationSheetSparePartByLubricationSheetId(sheetQuery.id);
 	} catch (error) {
+		console.log("clearLubricationSheet ~ error:", error)
 		return;
 	}
+}
+
+async function removeLubricationSheetSparePartByLubricationSheetId(sheet_id) {
+	await LubricationSheetSparePart.destroy({
+		where: {
+			lubrication_sheet_id: sheet_id,
+		},
+	});
 }
 
 function whereIdOrCode(query) {
@@ -233,18 +240,20 @@ async function linkMaintenanceFrequenciesToLubricationSheetSpareParts(
 	frequencies,
 	sheet_rows
 ) {
-	spare_parts.forEach((part) => {
+	for (let i=0; i < spare_parts.length; i++) {
+	// spare_parts.forEach((part) => {
+		const part = spare_parts[i];
 		const freqs = frequencies.filter((freq) =>
 			part.frequencies.includes(freq.frequency)
 		);
-		sheet_rows
+		await sheet_rows
 			.find((row) => {
 				return row.spare_part_id === part.spare_part_id
 					&& row.application === part.application
 					&& row.quantity === part.quantity
 			})
 			.addFrequencies(freqs);
-	});
+	};
 }
 
 async function createLubricationSheetRows(spare_parts, sheet_id) {

@@ -170,39 +170,38 @@ function getPartialCostForRow(parts, sparePartQuery) {
 	});
 }
 
-async function updateNextMaintenancesForEquipment(equipment) {
-	await NextMaintenance.destroy({
-		where: {
-			equipment_id: equipment.id,
-		},
-	});
-	let averageUseHours = 12;
-	const equipmentHours = await EquipmentHour.findAll({
-		where: {
-			equipment_id: equipment.id,
-		},
-	});
+async function updateNextMaintenancesForEquipment(equipments) {
+	if (!equipments) return;
+	let next_maintenances = [];
+	for (let i=0; i < equipments.length; i++) {
+		const equipment = equipments[i];
+		if (!equipment.lubrication_sheet_id) continue;
+		await NextMaintenance.destroy({
+			where: {
+				equipment_id: equipment.id,
+			},
+		});
+		let averageUseHours = 12;
+		const equipmentHours = await EquipmentHour.findAll({
+			where: {
+				equipment_id: equipment.id,
+			},
+		});
 
-	if (equipmentHours) averageUseHours = getAverageUseHours(equipmentHours);
+		if (equipmentHours) averageUseHours = getAverageUseHours(equipmentHours);
 
-	const lubrication_sheet_id = equipment.lubrication_sheet_id;
-	const maintenance_frequencies =
-		await findMaintenanceFrequenciesForLubricationSheet(
-			lubrication_sheet_id
+		const lubrication_sheet_id = equipment.lubrication_sheet_id;
+		const maintenance_frequencies = await findMaintenanceFrequenciesForLubricationSheet(lubrication_sheet_id);
+		if (!maintenance_frequencies) continue;
+		
+		const mants = getNextMaintenances(
+			maintenance_frequencies,
+			equipment,
+			averageUseHours
 		);
-	if (!maintenance_frequencies)
-		Utils.throwError(404, `Frequencies not found.`);
-
-	const next_maintenances = getNextMaintenances(
-		maintenance_frequencies,
-		equipment,
-		averageUseHours
-	);
-	if (!next_maintenances)
-		Utils.throwError(
-			500,
-			`Error trying to calculate the next maintenance dates.`
-		);
+		next_maintenances.push(...mants);
+	}
+	next_maintenances = next_maintenances.filter(maint => Utils.validateDate(maint.maintenance_date))
 	await NextMaintenance.bulkCreate(next_maintenances);
 }
 
@@ -215,6 +214,27 @@ async function findMaintenanceFrequenciesForLubricationSheet(
 		},
 	});
 	return frequencies;
+}
+
+async function removeMaintenanceFrequenciesForLubricationSheetId(sheet_id) {
+	const freqs = await MaintenanceFrequency.findAll({
+		where: {
+			lubrication_sheet_id: sheet_id,
+		}
+	})
+	for (let i=0; i < freqs.length; i++) {
+		await NextMaintenance.destroy({
+			where: {
+				maintenance_frequency_id: freqs[i].id
+			},
+		});
+	}
+
+	await MaintenanceFrequency.destroy({
+		where: {
+			lubrication_sheet_id: sheet_id,
+		},
+	});
 }
 
 function getAverageUseHours(equipmentHours) {
@@ -354,4 +374,5 @@ function catchError(res, error, message) {
 module.exports = {
 	createMaintenance,
 	updateNextMaintenancesForEquipment,
+	removeMaintenanceFrequenciesForLubricationSheetId,
 };
