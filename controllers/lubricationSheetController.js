@@ -18,9 +18,7 @@ const getLubricationSheetList = async (req, res) => {
 	try {
 		const sheets = await LubricationSheet.findAll({
 			include: LubricationSheet.includes,
-			where: whereClause(req.query),
 		});
-		console.log(sheets);
 		if (!sheets) return res.status(404).send(LUBRICATION_SHEET_NOT_FOUND);
 		return res.status(200).json(sheets);
 	} catch (error) {
@@ -137,6 +135,9 @@ const addSparePartToLubricationSheet = async (req, res) => {
 		code: body.equipment_code,
 	};
 
+	if (body.lubrication_sheet_id)
+		await clearLubricationSheet(sheetQuery)
+
 	try {
 		const equipment = await commonController.findEquipmentByIdOrCode(
 			equipmentQuery
@@ -178,6 +179,19 @@ const addSparePartToLubricationSheet = async (req, res) => {
 	}
 };
 
+async function clearLubricationSheet(sheetQuery) {
+	try {
+		const sheet = await findOrCreateLubricationSheet(sheetQuery);
+		if (!sheet) return;
+		await Promise.all(sheet.lubrication_sheet_spare_parts.map(async (row) => {
+			await Promise.all(row.frequencies.map(freq => freq.destroy()));
+			await row.destroy();
+		}));
+	} catch (error) {
+		return;
+	}
+}
+
 function whereIdOrCode(query) {
 	let where = {};
 	if (query.code !== undefined) {
@@ -197,6 +211,7 @@ async function findOrCreateLubricationSheet(query) {
 	if (query.id !== undefined && typeof query.id === "number") {
 		return await LubricationSheet.findOne({
 			where: whereIdOrCode(query),
+			include: LubricationSheet.includes
 		});
 	} else {
 		return await LubricationSheet.create();
@@ -248,10 +263,6 @@ function getSheetRowsFromQuery(sparePartQuery, sheet_id) {
 		});
 	});
 	return sheetRows;
-}
-
-function whereClause(query) {
-	return undefined;
 }
 
 function catchError(res, error, message) {

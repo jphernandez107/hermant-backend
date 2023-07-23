@@ -30,7 +30,20 @@ module.exports = (sequelize, DataTypes) => {
 				association: 'construction_site'
 			},
 			{
-				association: 'lubrication_sheet'
+				association: 'lubrication_sheet',
+				include: [
+					{
+						association: 'lubrication_sheet_spare_parts',
+						include: [
+							{
+								association: 'spare_part'
+							},
+							{
+								association: 'frequencies'
+							}
+						]
+					}
+				]
 			},
 			{
 				association: 'maintenances',
