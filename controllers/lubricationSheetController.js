@@ -50,12 +50,12 @@ const getLubricationSheetByEquipmentCode = async (req, res) => {
 };
 
 const findLubricationSheetByEquipmentCode = async (query) => {
-	const include = [...LubricationSheet.includes];
+	const include = JSON.parse(JSON.stringify(LubricationSheet.includes));
 	include[0].where = {
 		code: query.equipment_code,
 	};
 	const sheet = await LubricationSheet.findOne({
-		include: LubricationSheet.includes,
+		include: include,
 	});
 	return sheet;
 };
@@ -166,7 +166,7 @@ const addSparePartToLubricationSheet = async (req, res) => {
 			frequencies,
 			sheetRows
 		);
-		maintenanceController.updateNextMaintenancesForEquipment(sheet.equipments);
+		await maintenanceController.updateNextMaintenancesForEquipment(sheet.equipments);
 		sheet.addEquipments(equipment);
 		return Utils.successResponse(res, {
 			message: `Lubrication Sheet ${sheet.id} with ${sheetRows.length} rows created and added to equipment ${equipment.code} succesfully.`,
@@ -241,7 +241,6 @@ async function linkMaintenanceFrequenciesToLubricationSheetSpareParts(
 	sheet_rows
 ) {
 	for (let i=0; i < spare_parts.length; i++) {
-	// spare_parts.forEach((part) => {
 		const part = spare_parts[i];
 		const freqs = frequencies.filter((freq) =>
 			part.frequencies.includes(freq.frequency)

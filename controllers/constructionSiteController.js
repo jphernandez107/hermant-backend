@@ -2,8 +2,6 @@ const models = require('../ORM/models')
 const Site = models.construction_site;
 const { findSiteByIdOrCode } = require("./commonController");
 
-const includes = ["equipments"];
-
 const SITE_NOT_FOUND = `Site not found.`;
 const ERROR_CREATING_SITE = `Error creating site.`;
 const SITE_CREATED = `Site created successfully.`;
@@ -15,7 +13,7 @@ const ERROR_UPDATING_SITE = `Error updating site.`;
 const getSitesList = async (req, res) => {
 	try {
 		const sites = await Site.findAll({
-			include: includes,
+			include: Site.includes,
 			where: whereClause(req.query),
 		});
 		if (!sites) return res.status(404).send(SITE_NOT_FOUND);
