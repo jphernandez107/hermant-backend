@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
 	class NextMaintenance extends Model {
 		static associate(models) {
             NextMaintenance.belongsTo(models.equipment, {
+                as: "equipment",
                 foreignKey: 'equipment_id',
                 onDelete: 'CASCADE'
             });
@@ -13,6 +14,15 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'maintenance_frequency_id'
             });
 		}
+
+        static includes = [
+			{
+				association: 'equipment'
+			},
+			{
+				association: 'maintenance_frequency'
+			}
+		];
 	}
 	NextMaintenance.init({
 		id: {

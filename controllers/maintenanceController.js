@@ -1,3 +1,4 @@
+const i18n = require("i18n");
 const models = require("../ORM/models");
 const Maintenance = models.maintenance;
 const MaintenanceSparePart = models.maintenance_spare_part;
@@ -99,7 +100,7 @@ const createMaintenance = async (req, res) => {
 		await transaction.commit();
 	} catch (error) {
 		await transaction.rollback();
-		catchError(res, error, ERROR_CREATING_MAINTENANCE);
+		catchError(res, error, 400, ERROR_CREATING_MAINTENANCE);
 	}
 };
 
@@ -311,6 +312,23 @@ function getNextMaintenances(
 	return next_maintenances;
 }
 
+const getNextMaintenanceList = async (req, res) =>  {
+	try {
+		const next_maintenances = await NextMaintenance.findAll({
+			include: NextMaintenance.includes,
+			order: [
+				['maintenance_date', 'ASC']//
+			]
+		});
+		if (!next_maintenances) 
+            return catchError(res, null, 404, i18n.__("NEXT_MAINTENANCES_NOT_FOUND"));
+		
+		return res.status(200).json(next_maintenances);
+	} catch (error) {
+		catchError(res, error, 404, i18n.__("NEXT_MAINTENANCES_NOT_FOUND"));
+	}
+}
+
 /**
  *
  * @param {*} body
@@ -363,9 +381,9 @@ function validateBody(body) {
 	return null;
 }
 
-function catchError(res, error, message) {
+function catchError(res, error, code = 400, message) {
 	console.log(error);
-	res.status(400).json({
+	res.status(code).json({
 		message,
 		error,
 	});
@@ -375,4 +393,5 @@ module.exports = {
 	createMaintenance,
 	updateNextMaintenancesForEquipment,
 	removeMaintenanceFrequenciesForLubricationSheetId,
+	getNextMaintenanceList,
 };

@@ -20,5 +20,6 @@ router.post('/new', verifyRole(role), maintenanceController.createMaintenance);
 
 // // update a specific spare part
 // router.put('/edit', maintenanceController.updateMaintenance);
+router.get('/nextMaintenances', verifyRole(role), maintenanceController.getNextMaintenanceList)
 
 module.exports = router;
