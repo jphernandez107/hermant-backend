@@ -15,7 +15,7 @@ export class ConstructionSiteController extends BaseController implements IConst
 	public async getSitesList(req: Request, res: Response): Promise<Response<ConstructionSiteInstance[]>> {
 		try {
 			const sites = await this.service.getAllSites();
-			if (!sites) throw new Error(ConstructionSiteMessages.SITE_NOT_FOUND);
+			if (!sites) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
 			return res.status(200).json(sites);
 		} catch (error) {
 			return this.catchError(res, 404, error, i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
@@ -25,7 +25,7 @@ export class ConstructionSiteController extends BaseController implements IConst
 	public async getSiteByIdOrCode(req: Request, res: Response): Promise<Response<ConstructionSiteInstance>> {
 		try {
 			const site = await this.findSiteByIdOrCode(req);
-			if (!site) throw new Error(ConstructionSiteMessages.SITE_NOT_FOUND);
+			if (!site) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
 			return res.status(200).json(site);
 		} catch (error) {
 			return this.catchError(res, 404, error, i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
@@ -36,7 +36,7 @@ export class ConstructionSiteController extends BaseController implements IConst
 		try {
 			const siteAttributes = this.parseSiteFromBody(req);
 			const site = await this.service.createSite(siteAttributes);
-			if (!site) throw new Error(ConstructionSiteMessages.ERROR_CREATING_SITE);
+			if (!site) throw new Error(i18n.__(ConstructionSiteMessages.ERROR_CREATING_SITE));
 			return res.status(200).json({ 
 				message: i18n.__(ConstructionSiteMessages.SITE_CREATED), 
 				site: site 
@@ -64,7 +64,7 @@ export class ConstructionSiteController extends BaseController implements IConst
 			const siteAttributes = this.parseSiteFromBody(req, false);
 			const id: number = Number.parseInt(req.params.id);
 			const sites = await this.service.updateSite(id, siteAttributes);
-			if (!sites || sites[0] === 0) throw new Error(ConstructionSiteMessages.ERROR_UPDATING_SITE);
+			if (!sites || sites[0] === 0) throw new Error(i18n.__(ConstructionSiteMessages.ERROR_UPDATING_SITE));
 			return res.status(200).json({ 
 				message: i18n.__(ConstructionSiteMessages.SITE_UPDATED), 
 				sites: sites 
@@ -78,16 +78,16 @@ export class ConstructionSiteController extends BaseController implements IConst
 		let id: number | null = null;
 		let code: string | null = null;
 
-		if (typeof req.query.id === 'string') {
+		if (typeof req.query.id === 'string' || typeof req.query.id === 'number') {
 			id = Number.parseInt(req.query.id);
-		} else if (typeof req.query.equipment_id === 'string') {
-			id = Number.parseInt(req.query.equipment_id);
+		} else if (typeof req.query.site_id === 'string' || typeof req.query.site_id === 'number') {
+			id = Number.parseInt(req.query.site_id);
 		}
 
 		if (typeof req.query.code === 'string') {
 			code = req.query.code;
-		} else if (typeof req.query.equipment_code === 'string') {
-			code = req.query.equipment_code;
+		} else if (typeof req.query.site_code === 'string') {
+			code = req.query.site_code;
 		}
 
 		return await this.service.getSiteByIdOrCode(id, code);

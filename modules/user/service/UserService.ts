@@ -33,9 +33,9 @@ export class UserService implements IUserService {
 
 	public async loginUser(dni: string, password: string): Promise<[string, UserInstance | null]> {
 		const user = await this.userRepository.getUserByDni(dni);
-		if (!user) throw new Error(UserMessages.USER_NOT_FOUND);
+		if (!user) throw new Error(i18n.__(UserMessages.USER_NOT_FOUND));
 		const passwordMatch = await bcrypt.compare(password, user.password);
-		if (!passwordMatch) throw new Error(UserMessages.INCORRECT_PASSWORD);
+		if (!passwordMatch) throw new Error(i18n.__(UserMessages.INCORRECT_PASSWORD));
 
 		user.last_login = new Date();
 		await this.userRepository.saveUser(user)
@@ -53,13 +53,13 @@ export class UserService implements IUserService {
 
 	public async activateUser(id: number): Promise<[number, UserInstance[]]> {
 		const user = await this.userRepository.getUserById(id);
-		if (!user) throw new Error(UserMessages.USER_NOT_FOUND);
+		if (!user) throw new Error(i18n.__(UserMessages.USER_NOT_FOUND));
 		return await this.userRepository.updateUser(id, { active: true });
 	}
 
 	public async deactivateUser(id: number): Promise<[number, UserInstance[]]> {
 		const user = await this.userRepository.getUserById(id);
-		if (!user) throw new Error(UserMessages.USER_NOT_FOUND);
+		if (!user) throw new Error(i18n.__(UserMessages.USER_NOT_FOUND));
 		return await this.userRepository.updateUser(id, { active: false });
 	}
 }

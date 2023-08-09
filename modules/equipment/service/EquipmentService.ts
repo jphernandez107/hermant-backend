@@ -44,7 +44,7 @@ export class EquipmentService implements IEquipmentService {
 
 	public async deleteEquipment(id: number | null, code: string | null): Promise<void> {
 		const equipment = await this.getEquipmentByIdOrCode(id, code);
-		if (!equipment) throw new Error(EquipmentMessages.EQUIPMENT_NOT_FOUND);
+		if (!equipment) throw new Error(i18n.__(EquipmentMessages.EQUIPMENT_NOT_FOUND));
 		return this.equipmentRepository.deleteEquipment(equipment!);
 	}
 

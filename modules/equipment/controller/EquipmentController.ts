@@ -46,7 +46,7 @@ class EquipmentController extends BaseController implements IEquipmentController
 	}
 	public async deleteEquipment(req: Request, res: Response): Promise<Response<number>> {
 		try {
-			const id = req.body.id as number || null;
+			const id = parseInt(req.body.id) || null;
 			const code = req.body.code as string || null;
 			await this.equipmentService.deleteEquipment(id, code);
 			return res.status(200).json({
@@ -191,9 +191,9 @@ class EquipmentController extends BaseController implements IEquipmentController
 		let id: number | null = null;
 		let code: string | null = null;
 
-		if (typeof req.query.id === 'string') {
+		if (typeof req.query.id === 'string' || typeof req.query.id === 'number') {
 			id = Number.parseInt(req.query.id);
-		} else if (typeof req.query.equipment_id === 'string') {
+		} else if (typeof req.query.equipment_id === 'string' || typeof req.query.equipment_id === 'number') {
 			id = Number.parseInt(req.query.equipment_id);
 		}
 

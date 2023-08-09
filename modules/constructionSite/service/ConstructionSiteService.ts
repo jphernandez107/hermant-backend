@@ -34,7 +34,7 @@ export class ConstructionSiteService implements IConstructionSiteService {
 
 	public async deleteSite(id: number | null, code: string | null): Promise<void> {
 		const site = await this.getSiteByIdOrCode(id, code);
-		if (!site) throw new Error(ConstructionSiteMessages.SITE_NOT_FOUND);
+		if (!site) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
 		return await this.repository.deleteSite(site);
 	}
 
