@@ -1,3 +1,4 @@
+import { NextMaintenanceInstance } from 'modules/maintenance/model/INextMaintenance';
 import { Model, Optional } from 'sequelize';
 
 export interface EquipmentAttributes {
@@ -22,6 +23,8 @@ export interface EquipmentAttributes {
 	next_maintenance?: Date | null;
 	created_at: Date;
 	updated_at: Date;
+
+	next_maintenances?: NextMaintenanceInstance[];
 }
 
 export interface EquipmentCreationAttributes extends Optional<EquipmentAttributes, 'id' | 'created_at' | 'updated_at'> {}

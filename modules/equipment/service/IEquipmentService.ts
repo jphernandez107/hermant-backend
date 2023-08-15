@@ -13,6 +13,8 @@ export interface IEquipmentService {
 	addLubricationSheetToEquipment(equipment: EquipmentInstance, lubricationSheetId: number): Promise<EquipmentInstance>;
 	addEquipmentToSite(equipment: EquipmentInstance, siteId: number | null, siteCode: string | null): Promise<ConstructionSiteInstance>;
 	removeEquipmentFromSite(equipment: EquipmentInstance, siteId: number | null, siteCode: string | null): Promise<ConstructionSiteInstance>;
+	resetEquipmentPartialHours(equipment: EquipmentInstance): Promise<EquipmentInstance>;
+	getEquipmentHoursByEquipmentId(equipmentId: number): Promise<EquipmentHourInstance[]>;
 }
 
 export interface EquipmentHourAddedInBulk {

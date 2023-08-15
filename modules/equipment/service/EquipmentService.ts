@@ -5,16 +5,29 @@ import { EquipmentHourCreationAttributes, EquipmentHourCreationInBulkAttributes,
 import { IEquipmentHourRepository } from '../repository/IEquipmentHourRepository';
 import { IConstructionSiteService, ConstructionSiteMessages } from 'modules/constructionSite/service/IConstructionSiteService';
 import { ConstructionSiteInstance } from 'modules/constructionSite/model/IConstructionSite';
+import { IMaintenanceService } from 'modules/maintenance/service/IMaintenanceService';
+import { INextMaintenanceService } from 'modules/maintenance/service/INextMaintenanceService';
+import { ILubricationSheetService, LubricationSheetMessages } from 'modules/lubricationSheet/service/ILubricationSheetService';
 
 export class EquipmentService implements IEquipmentService {
 	private equipmentRepository: IEquipmentRepository;
 	private equipmentHourRepository: IEquipmentHourRepository;
 	private constructionSiteService: IConstructionSiteService;
+	private nextMaintenanceService: INextMaintenanceService;
+	private lubricationSheetService: ILubricationSheetService;
 
-	constructor(equipmentRepository: IEquipmentRepository, equipmentHourRepository: IEquipmentHourRepository, constructionSiteService: IConstructionSiteService) {
+	constructor(
+		equipmentRepository: IEquipmentRepository, 
+		equipmentHourRepository: IEquipmentHourRepository, 
+		constructionSiteService: IConstructionSiteService, 
+		nextMaintenanceService: INextMaintenanceService,
+		lubricationSheetService: ILubricationSheetService
+	) {
 		this.equipmentRepository = equipmentRepository;
 		this.equipmentHourRepository = equipmentHourRepository;
 		this.constructionSiteService = constructionSiteService;
+		this.nextMaintenanceService = nextMaintenanceService;
+		this.lubricationSheetService = lubricationSheetService;
 	}
 
 	public async getAllEquipments(): Promise<EquipmentInstance[]> {
@@ -83,7 +96,7 @@ export class EquipmentService implements IEquipmentService {
 				equipmentsWithErrors.push(equipment.code);
 			}
 		}
-		// TODO: maintenanceController.updateNextMaintenancesForEquipment(equipmentsSuccessfullyModified);
+		this.nextMaintenanceService.updateNextMaintenancesForEquipments(equipmentsSuccessfullyModified);
 		const message = this.equipmentHoursBulkAddedMessage(equipmentsSuccessfullyModified, equipmentsWithErrors);
 		const statusCode = equipmentsWithErrors.length > 0 ? 400 : 200;
 		return {
@@ -95,10 +108,9 @@ export class EquipmentService implements IEquipmentService {
 	}
 
 	public async addLubricationSheetToEquipment(equipment: EquipmentInstance, lubricationSheetId: number): Promise<EquipmentInstance> {
-		// TODO: Add lubricationSheetRepository
-		//const lubrication_sheet = await this.lubricationSheetRepository.getLubricationSheetById(lubricationSheetId);
-		//if (!lubrication_sheet) throw new Error(i18n.__("LUBRICATION_SHEET_NOT_FOUND"));
-		//equipment.lubrication_sheet_id = lubrication_sheet.id;
+		const lubricationSheet = await this.lubricationSheetService.getLubricationSheetById(lubricationSheetId);
+		if (!lubricationSheet) throw new Error(i18n.__(LubricationSheetMessages.LUBRICATION_SHEET_NOT_FOUND));
+		equipment.lubrication_sheet_id = lubricationSheet.id;
 		return this.equipmentRepository.saveEquipment(equipment);
 	}
 	public async addEquipmentToSite(equipment: EquipmentInstance, siteId: number, siteCode: string): Promise<ConstructionSiteInstance> {
@@ -115,6 +127,13 @@ export class EquipmentService implements IEquipmentService {
 		const site = await this.constructionSiteService.getSiteByIdOrCode(siteId, siteCode);
 		if (!site) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
 		return site;
+	}
+	public async resetEquipmentPartialHours(equipment: EquipmentInstance): Promise<EquipmentInstance> {
+		equipment.partial_hours = 0;
+		return this.equipmentRepository.saveEquipment(equipment);
+	}
+	public async getEquipmentHoursByEquipmentId(equipmentId: number): Promise<EquipmentHourInstance[]> {
+		return this.equipmentHourRepository.getEquipmentHoursByEquipmentId(equipmentId);
 	}
 
 	private equipmentHoursBulkAddedMessage = (equipments: EquipmentInstance[], errors: string[]): string => {
@@ -149,18 +168,8 @@ export class EquipmentService implements IEquipmentService {
 	}
 
 	private processEquipments(equipment: EquipmentInstance): void {
-		/// TODO: add next_maintenance to equipment
-
-		// const firstMaint = equipment.next_maintenances
-		// .map((maint) => new Date(maint.maintenance_date))
-		// .min();
-
-		// const next_maintenance: Date = firstMaint
-		// 	? new Date(firstMaint)
-		// 	: null;
-		
-		// equipment.next_maintenance = next_maintenance
-		// 	? next_maintenance.toLocaleDateString()
-		// 	: undefined;
+		const firstMaintenance = equipment.next_maintenances.map((maint) => maint.maintenance_date);
+		const next_maintenance: Date = firstMaintenance.minDate();
+		equipment.next_maintenance = next_maintenance;
 	}
 }

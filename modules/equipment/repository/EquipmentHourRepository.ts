@@ -12,4 +12,7 @@ export class EquipmentHourRepository implements IEquipmentHourRepository {
 	public async createEquipmentHoursInBulk(equipmentHours: EquipmentHourCreationAttributes[]): Promise<EquipmentHourInstance[]> {
 		return EquipmentHour.bulkCreate(equipmentHours);
 	}
+	public async getEquipmentHoursByEquipmentId(equipmentId: number): Promise<EquipmentHourInstance[]> {
+		return EquipmentHour.findAll({ where: { equipment_id: equipmentId } });
+	}
 }
