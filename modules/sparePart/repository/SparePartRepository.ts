@@ -1,14 +1,15 @@
+import { singleton } from "tsyringe";
 import { SparePartInstance, SparePartCreationAttributes, SparePartUpdateAttributes } from "../model/ISparePart";
 import { SparePart } from "../model/SparePart";
 import { ISparePartRepository, SparePartIncludes } from "./ISparePartRepository";
 
-
+@singleton()
 export class SparePartRepository implements ISparePartRepository {
 	public async getAllSpareParts(): Promise<SparePartInstance[]> {
 		return SparePart.findAll({
 			include: SparePartIncludes,
 			order: [
-				['code', 'DESC']
+				['external_code', 'DESC']
 			]
 		});
 	}

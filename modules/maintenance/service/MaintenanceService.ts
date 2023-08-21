@@ -1,34 +1,40 @@
-import { EquipmentInstance } from "modules/equipment/model/IEquipment";
+import { inject, injectable, singleton } from "tsyringe";
+import { EquipmentInstance } from "../../equipment/model/IEquipment";
 import { MaintenanceFrequencyInstance } from "../model/IMaintenanceFrequency";
 import { IMaintenanceFrequencyRepository } from "../repository/IMaintenanceFrequecyRepository";
 import { IMaintenanceService, MaintenanceMessages } from "./IMaintenanceService";
 import { MaintenanceCreationAttributes, MaintenanceInstance } from "../model/IMaintenance";
-import { EquipmentMessages, IEquipmentService } from "modules/equipment/service/IEquipmentService";
 import { Maintenance } from "../model/Maintenance";
 import { IMaintenanceSparePartService } from "./IMaintenanceSparePartService";
 import { MaintenanceSparePartInstance } from "../model/IMaintenanceSparePart";
+import { MaintenanceFrequencyRepository } from "../repository/MaintenanceFrequencyRepository";
+import { MaintenanceSparePartService } from "./MaintenanceSparePartService";
+import { IEquipmentRepository } from "../../equipment/repository/IEquipmentRepository";
+import { EquipmentRepository } from "../../equipment/repository/EquipmentRepository";
+import { EquipmentMessages } from "../../equipment/service/IEquipmentService";
+import i18n from 'i18n';
 
+@singleton()
+@injectable()
 export class MaintenanceService implements IMaintenanceService {
-	private maintenanceFrequencyRepository: IMaintenanceFrequencyRepository;
-	private equipmentService: IEquipmentService;
-	private maintenanceSparePartService: IMaintenanceSparePartService;
 
 	constructor(
-		maintenanceFrequencyRepository: IMaintenanceFrequencyRepository, 
-		equipmentService: IEquipmentService, 
-		maintenanceSparePartService: IMaintenanceSparePartService
-	) {
-		this.maintenanceFrequencyRepository = maintenanceFrequencyRepository;
-		this.equipmentService = equipmentService;
-		this.maintenanceSparePartService = maintenanceSparePartService;
-	}
+		@inject(MaintenanceFrequencyRepository) private maintenanceFrequencyRepository: IMaintenanceFrequencyRepository,
+		@inject(EquipmentRepository) private equipmentRepository: IEquipmentRepository, 
+		@inject(MaintenanceSparePartService) private maintenanceSparePartService: IMaintenanceSparePartService
+	) {}
 
 	public async createMaintenanceFrequenciesInBulk(frequencies: number[], lubricationSheetId: number): Promise<MaintenanceFrequencyInstance[]> {
 		return this.maintenanceFrequencyRepository.createMaintenanceFrequenciesInBulk(frequencies, lubricationSheetId);
 	}
 
 	public async deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId: number): Promise<number> {
-		return this.maintenanceFrequencyRepository.deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId);
+		try {
+			return await this.maintenanceFrequencyRepository.deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId);
+		} catch (error) {
+			console.log("~ file: MaintenanceService.ts:40 ~ MaintenanceService ~ deleteMaintenanceFrequenciesByLubricationSheetId ~ error:", error)
+			return null;
+		}
 	}
 
 	public async getAllMaintenances(): Promise<MaintenanceInstance[]> {
@@ -36,7 +42,7 @@ export class MaintenanceService implements IMaintenanceService {
 	}
 
 	public async createMaintenance(maintenanceAttributes: MaintenanceCreationAttributes): Promise<MaintenanceInstance> {
-		const equipment = await this.equipmentService.getEquipmentByIdOrCode(null, maintenanceAttributes.equipment_code);
+		const equipment = await this.equipmentRepository.getEquipmentByCode(maintenanceAttributes.equipment_code);
 		if (!equipment) throw new Error(EquipmentMessages.EQUIPMENT_NOT_FOUND)
 		const maintenanceFrequency = await this.maintenanceFrequencyRepository.getMaintenanceFrequencyByLubricationSheetIdAndFrequency(equipment.lubrication_sheet_id, maintenanceAttributes.maintenance_frequency);
 		if (!maintenanceFrequency) throw new Error(MaintenanceMessages.MAINTENANCE_FREQUENCY_NOT_FOUND);
@@ -63,7 +69,7 @@ export class MaintenanceService implements IMaintenanceService {
 	}
 
 	private async resetEquipmentPartialHours(resetPartialHours: boolean, equipment: EquipmentInstance): Promise<void> {
-		if (resetPartialHours) await this.equipmentService.resetEquipmentPartialHours(equipment);
+		if (resetPartialHours) await this.equipmentRepository.resetEquipmentPartialHours(equipment);
 	}
 
 }

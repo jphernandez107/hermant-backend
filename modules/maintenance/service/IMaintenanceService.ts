@@ -1,4 +1,4 @@
-import { EquipmentInstance } from "modules/equipment/model/IEquipment";
+import { EquipmentInstance } from "../../equipment/model/IEquipment";
 import { MaintenanceFrequencyInstance } from "../model/IMaintenanceFrequency";
 import { MaintenanceCreationAttributes, MaintenanceInstance } from "../model/IMaintenance";
 

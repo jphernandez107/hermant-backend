@@ -3,10 +3,10 @@ interface Date {
 	validateDate(): boolean;
 }
 
-Date.prototype.addDays = function(days) {
-    var date = new Date(this.valueOf());
-    date.setDate(date.getDate() + days);
-    return date;
+Date.prototype.addDays = function(days: number) {
+	var date = new Date(this.valueOf());
+	date.setDate(date.getDate() + days);
+	return date;
 }
 
 Date.prototype.validateDate = function() {

@@ -1,3 +1,4 @@
+import { EquipmentInstance } from 'modules/equipment/model/IEquipment';
 import { Model, Optional } from 'sequelize';
 
 export interface ConstructionSiteAttributes {
@@ -16,6 +17,8 @@ export interface ConstructionSiteAttributes {
 	observations?: string | null;
 	created_at: Date;
 	updated_at: Date;
+
+	addEquipment?: (equipment: EquipmentInstance, options?: any) => Promise<void>;
 }
 
 export interface ConstructionSiteCreationAttributes extends Optional<ConstructionSiteAttributes, 'id' | 'created_at' | 'updated_at'> {}

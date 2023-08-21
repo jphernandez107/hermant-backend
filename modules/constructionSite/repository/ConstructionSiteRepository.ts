@@ -1,7 +1,9 @@
+import { singleton } from 'tsyringe';
 import { ConstructionSite } from '../model/ConstructionSite';
 import { ConstructionSiteCreationAttributes, ConstructionSiteInstance, ConstructionSiteUpdateAttributes } from '../model/IConstructionSite';
 import { ConstructionSiteIncludes, IConstructionSiteRepository } from './IConstructionSiteRepository';
 
+@singleton()
 export class ConstructionSiteRepository implements IConstructionSiteRepository {
   
 	public async getAllSites(): Promise<ConstructionSite[]> {

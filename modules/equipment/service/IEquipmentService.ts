@@ -1,19 +1,18 @@
 import { EquipmentCreationAttributes, EquipmentInstance } from '../model/IEquipment';
 import { EquipmentHourCreationInBulkAttributes, EquipmentHourInstance } from '../model/IEquipmentHour';
-import { ConstructionSiteInstance } from 'modules/constructionSite/model/IConstructionSite';
+import { ConstructionSiteInstance } from '../../constructionSite/model/IConstructionSite';
 
 export interface IEquipmentService {
 	getAllEquipments(): Promise<EquipmentInstance[]>;
 	getEquipmentByIdOrCode(id: number | null, code: string | null): Promise<EquipmentInstance | null>;
 	createEquipment(equipmentAttributes: EquipmentCreationAttributes): Promise<EquipmentInstance>;
-	updateEquipment(id: number, equipmentAttributes: EquipmentCreationAttributes): Promise<[number, EquipmentInstance[]]>;
-	deleteEquipment(id: number | null, code: string | null): Promise<void>;
+	updateEquipment(id: number | null, code: string | null, equipmentAttributes: EquipmentCreationAttributes): Promise<[number, EquipmentInstance]>;
+	deleteEquipment(id: number | null, code: string | null): Promise<EquipmentInstance>;
 	getAllEquipmentHours(): Promise<EquipmentHourInstance[]>;
 	addEquipmentHoursInBulk(equipmentHours: EquipmentHourCreationInBulkAttributes): Promise<EquipmentHourAddedInBulk>;
 	addLubricationSheetToEquipment(equipment: EquipmentInstance, lubricationSheetId: number): Promise<EquipmentInstance>;
 	addEquipmentToSite(equipment: EquipmentInstance, siteId: number | null, siteCode: string | null): Promise<ConstructionSiteInstance>;
 	removeEquipmentFromSite(equipment: EquipmentInstance, siteId: number | null, siteCode: string | null): Promise<ConstructionSiteInstance>;
-	resetEquipmentPartialHours(equipment: EquipmentInstance): Promise<EquipmentInstance>;
 	getEquipmentHoursByEquipmentId(equipmentId: number): Promise<EquipmentHourInstance[]>;
 }
 

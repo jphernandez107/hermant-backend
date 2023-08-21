@@ -5,9 +5,10 @@ export interface IEquipmentRepository {
 	getEquipmentById(id: number): Promise<EquipmentInstance | null>;
 	getEquipmentByCode(code: string): Promise<EquipmentInstance | null>;
 	createEquipment(equipmentAttributes: EquipmentCreationAttributes): Promise<EquipmentInstance>;
-	updateEquipment(id: number, equipmentAttributes: EquipmentCreationAttributes): Promise<[number, EquipmentInstance[]]>;
+	updateEquipment(id: number, equipmentAttributes: EquipmentCreationAttributes): Promise<[number]>;
 	saveEquipment(equipment: EquipmentInstance): Promise<EquipmentInstance>;
 	deleteEquipment(equipment: EquipmentInstance): Promise<void>;
+	resetEquipmentPartialHours(equipment: EquipmentInstance): Promise<EquipmentInstance>;
 }
 
 export const EquipmentIncludes = [

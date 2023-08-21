@@ -1,12 +1,20 @@
+import { singleton, inject, injectable } from 'tsyringe';
 import { IUserService, UserMessages } from '../service/IUserService';
 import { UserCreationAttributes, UserInstance } from '../model/IUser';
 import { IUserRepository } from '../repository/IUserRepository';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { UserRepository } from '../repository/UserRepository';
+import i18n from 'i18n';
 
+@singleton()
+@injectable()
 export class UserService implements IUserService {
-	constructor(private userRepository: IUserRepository) {}
 	SALT_ROUNDS = 10;  // for bcrypt
+
+	constructor(
+		@inject(UserRepository) private userRepository: IUserRepository
+	){}
 
 	public async getUsersList(): Promise<UserInstance[]> {
 		return await this.userRepository.getUsersList();

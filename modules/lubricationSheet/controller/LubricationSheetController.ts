@@ -1,21 +1,17 @@
-import { BaseController } from "modules/interfaces/BaseController";
+import { BaseController } from "../../interfaces/BaseController";
 import { ILubricationSheetController } from "./ILubricationSheetController";
 import { ILubricationSheetService, LubricationSheetMessages } from "../service/ILubricationSheetService";
 import { Request, Response } from "express";
 import { LubricationSheetCreationAttributes, LubricationSheetInstance } from "../model/ILubricationSheet";
-import { ParamsDictionary } from "express-serve-static-core";
-import { ParsedQs } from "qs";
 import { LubricationSheetSparePartCreationAttributes } from "../model/ILubricationSheetSparePart";
+import { container } from "tsyringe";
+import { LubricationSheetService } from "../service/LubricationSheetService";
+import i18n from 'i18n';
 
-class LubricationSheetController extends BaseController implements ILubricationSheetController {
-	private lubricationSheetService: ILubricationSheetService;
+export class LubricationSheetController extends BaseController implements ILubricationSheetController {
+	private lubricationSheetService: ILubricationSheetService = container.resolve<ILubricationSheetService>(LubricationSheetService);
 
-	constructor(lubricationSheetService: ILubricationSheetService) {
-		super();
-		this.lubricationSheetService = lubricationSheetService;
-	}
-
-	public async getLubricationSheetList(req: Request, res: Response): Promise<Response<LubricationSheetInstance[]>> {
+	public getLubricationSheetList = async (req: Request, res: Response): Promise<Response<LubricationSheetInstance[]>> => {
 		try {
 			const lubricationSheets = await this.lubricationSheetService.getAllLubricationSheets();
 			if (!lubricationSheets) throw new Error(i18n.__(LubricationSheetMessages.LUBRICATION_SHEET_NOT_FOUND));
@@ -25,9 +21,9 @@ class LubricationSheetController extends BaseController implements ILubricationS
 		}
 	}
 
-	public async getLubricationSheetById(req: Request, res: Response): Promise<Response<LubricationSheetInstance>> {
+	public getLubricationSheetById = async (req: Request, res: Response): Promise<Response<LubricationSheetInstance>> => {
 		try {
-			const id: number = parseInt(req.params.id);
+			const id: number = parseInt(req.query.id as string);
 			const lubricationSheet = await this.lubricationSheetService.getLubricationSheetById(id);
 			if (!lubricationSheet) throw new Error(i18n.__(LubricationSheetMessages.LUBRICATION_SHEET_NOT_FOUND));
 			return res.status(200).json(lubricationSheet);
@@ -36,9 +32,9 @@ class LubricationSheetController extends BaseController implements ILubricationS
 		}
 	}
 
-	public async getLubricationSheetByEquipmentCode(req: Request, res: Response): Promise<Response<LubricationSheetInstance>> {
+	public getLubricationSheetByEquipmentCode = async (req: Request, res: Response): Promise<Response<LubricationSheetInstance>> => {
 		try {
-			const code: string = req.params.code;
+			const code: string = req.query.code as string || req.query.equipment_code as string;
 			const lubricationSheet = await this.lubricationSheetService.getLubricationSheetByEquipmentCode(code);
 			if (!lubricationSheet) throw new Error(i18n.__(LubricationSheetMessages.LUBRICATION_SHEET_NOT_FOUND));
 			return res.status(200).json(lubricationSheet);
@@ -47,7 +43,7 @@ class LubricationSheetController extends BaseController implements ILubricationS
 		}
 	}
 
-	public async postNewLubricationSheet(req: Request, res: Response): Promise<Response<LubricationSheetInstance>> {
+	public postNewLubricationSheet = async (req: Request, res: Response): Promise<Response<LubricationSheetInstance>> => {
 		try {
 			const lubricationSheet = await this.lubricationSheetService.createLubricationSheet();
 			if (!lubricationSheet) throw new Error(i18n.__(LubricationSheetMessages.ERROR_CREATING_LUBRICATION_SHEET));
@@ -60,9 +56,9 @@ class LubricationSheetController extends BaseController implements ILubricationS
 		}
 	}
 
-	public async deleteLubricationSheet(req: Request, res: Response): Promise<Response<void>> {
+	public deleteLubricationSheet = async (req: Request, res: Response): Promise<Response<void>> => {
 		try {
-			const id: number = parseInt(req.params.id);
+			const id: number = parseInt(req.query.id as string);
 			const lubricationSheet = await this.lubricationSheetService.deleteLubricationSheet(id);
 			return res.status(200).json({
 				message: i18n.__(LubricationSheetMessages.LUBRICATION_SHEET_DELETED),
@@ -72,9 +68,8 @@ class LubricationSheetController extends BaseController implements ILubricationS
 		}
 	}
 
-	public async addSparePartsToLubricationSheet(req: Request, res: Response): Promise<Response<LubricationSheetInstance>> {
+	public addSparePartsToLubricationSheet = async (req: Request, res: Response): Promise<Response<LubricationSheetInstance>> => {
 		try {
-			const id: number = parseInt(req.params.id);
 			const lubricationSheetAttributes = this.parseLubricationSheetFromBody(req);
 			const lubricationSheet = await this.lubricationSheetService.addSparePartsToLubricationSheet(lubricationSheetAttributes);
 			if (!lubricationSheet) throw new Error(i18n.__(LubricationSheetMessages.ERROR_CREATING_LUBRICATION_SHEET));
@@ -89,6 +84,7 @@ class LubricationSheetController extends BaseController implements ILubricationS
 
 	private parseLubricationSheetFromBody(req: Request): LubricationSheetCreationAttributes {
 		return {
+			id: req.body.lubrication_sheet_id || null,
 			equipment_code: req.body.equipment_code,
 			frequencies: req.body.frequencies,
 			spare_parts: this.parseSparePartRowsFromBody(req),
@@ -99,7 +95,7 @@ class LubricationSheetController extends BaseController implements ILubricationS
 		const spareParts: LubricationSheetSparePartCreationAttributes[] = [];
 		for (const sparePart of req.body.spare_parts) {
 			spareParts.push({
-				spare_part_id: sparePart.sparePartId,
+				spare_part_id: sparePart.spare_part_id,
 				application: sparePart.application,
 				quantity: sparePart.quantity,
 				frequencies: sparePart.frequencies,

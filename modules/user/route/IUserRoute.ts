@@ -1,3 +1,3 @@
-import { IRoute } from 'modules/interfaces/IRoute';
+import { IRoute } from '../../interfaces/IRoute';
 
 export interface IUserRoute extends IRoute {}

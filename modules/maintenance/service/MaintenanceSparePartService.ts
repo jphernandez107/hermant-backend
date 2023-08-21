@@ -1,17 +1,21 @@
-import { ISparePartService } from "modules/sparePart/service/ISparePartService";
+import { inject, injectable, singleton } from "tsyringe";
+import { ISparePartService } from "../../sparePart/service/ISparePartService";
 import { IMaintenanceSparePartService, MaintenanceSparePartMessages } from "./IMaintenanceSparePartService";
 import { IMaintenanceSparePartRepository } from "../repository/IMaintenanceSparePartRepository";
 import { MaintenanceSparePartCreationAttributes, MaintenanceSparePartInstance } from "../model/IMaintenanceSparePart";
 import { MaintenanceInstance } from "../model/IMaintenance";
+import { MaintenanceSparePartRepository } from "../repository/MaintenanceSparePartRepository";
+import { SparePartService } from "../../sparePart/service/SparePartService";
+import i18n from 'i18n';
 
+@singleton()
+@injectable()
 export class MaintenanceSparePartService implements IMaintenanceSparePartService {
-	private maintenanceSparePartRepository: IMaintenanceSparePartRepository;
-	private sparePartService: ISparePartService;
-
-	constructor(maintenanceSparePartRepository: IMaintenanceSparePartRepository, sparePartService: ISparePartService) {
-		this.maintenanceSparePartRepository = maintenanceSparePartRepository;
-		this.sparePartService = sparePartService;
-	}
+	
+	constructor(
+		@inject(MaintenanceSparePartRepository) private maintenanceSparePartRepository: IMaintenanceSparePartRepository,
+		@inject(SparePartService) private sparePartService: ISparePartService
+	) {}
 
 	public async createMaintenanceSparePartsInBulk(maintenanceSparePartAttributes: MaintenanceSparePartCreationAttributes[], maintenance: MaintenanceInstance): Promise<MaintenanceSparePartInstance[]> {
 		const sparePartsWithCosts = await this.getPartialCostForRow(maintenanceSparePartAttributes);

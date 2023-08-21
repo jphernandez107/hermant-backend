@@ -1,30 +1,35 @@
-import { EquipmentInstance } from "modules/equipment/model/IEquipment";
+import { EquipmentInstance } from "../../equipment/model/IEquipment";
 import { INextMaintenanceService, NUMBER_OF_MAINTENANCES_TO_CREATE } from "./INextMaintenanceService";
 import { NextMaintenanceCreationAttributes, NextMaintenanceInstance } from "../model/INextMaintenance";
 import { INextMaintenanceRepository } from "../repository/INextMaintenanceRepository";
-import { IEquipmentService } from "modules/equipment/service/IEquipmentService";
-import { EquipmentHourInstance } from "modules/equipment/model/IEquipmentHour";
+import { EquipmentHourInstance } from "../../equipment/model/IEquipmentHour";
 import { MaintenanceFrequencyInstance } from "../model/IMaintenanceFrequency";
 import { IMaintenanceFrequencyRepository } from "../repository/IMaintenanceFrequecyRepository";
+import { NextMaintenanceRepository } from "../repository/NextMaintenanceRepository";
+import { MaintenanceFrequencyRepository } from "../repository/MaintenanceFrequencyRepository";
+import { inject, injectable, singleton } from "tsyringe";
+import { EquipmentHourRepository } from "../../equipment/repository/EquipmentHourRepository";
+import { IEquipmentHourRepository } from "../../equipment/repository/IEquipmentHourRepository";
+import i18n from 'i18n';
 
+import "../../../utils/DateExtensions";
+
+@singleton()
+@injectable()
 export class NextMaintenanceService implements INextMaintenanceService {
-	private nextMaintenanceRepository: INextMaintenanceRepository;
-	private maintenanceFrequencyRepository: IMaintenanceFrequencyRepository;
-	private equipmentService: IEquipmentService;
-
-	constructor(nextMaintenanceRepository: INextMaintenanceRepository, maintenanceFrequencyRepository: IMaintenanceFrequencyRepository , equipmentService: IEquipmentService) {
-		this.nextMaintenanceRepository = nextMaintenanceRepository;
-		this.maintenanceFrequencyRepository = maintenanceFrequencyRepository;
-		this.equipmentService = equipmentService;
-	}
-
+	
+	constructor(
+		@inject(NextMaintenanceRepository) private nextMaintenanceRepository: INextMaintenanceRepository,
+		@inject(MaintenanceFrequencyRepository) private maintenanceFrequencyRepository: IMaintenanceFrequencyRepository,
+		@inject(EquipmentHourRepository) private equipmentHourRepository: IEquipmentHourRepository
+	) {}
 
 	public async updateNextMaintenancesForEquipments(equipments: EquipmentInstance[]): Promise<NextMaintenanceInstance[]> {
 		let nextMaintenances: NextMaintenanceCreationAttributes[] = [];
 		for (let equipment of equipments) {
 			if (!equipment.lubrication_sheet_id) continue;
 			await this.nextMaintenanceRepository.removeNextMaintenancesByEquipmentId(equipment.id);
-			const equipmentHours = await this.equipmentService.getEquipmentHoursByEquipmentId(equipment.id);
+			const equipmentHours = await this.equipmentHourRepository.getEquipmentHoursByEquipmentId(equipment.id);
 			const averageUseHours = this.calculateAverageUseHours(equipmentHours);
 			const maintenanceFrequencies = await this.maintenanceFrequencyRepository.getMaintenanceFrequenciesByLubricationSheetId(equipment.lubrication_sheet_id);
 			if (maintenanceFrequencies.length === 0) continue;
@@ -42,11 +47,11 @@ export class NextMaintenanceService implements INextMaintenanceService {
 	private calculateAverageUseHours(equipmentHours: EquipmentHourInstance[]): number {
 		if (equipmentHours.length === 0) return 12;
 		const currentDate = new Date();
-		const thirtyDaysAgo = new Date(currentDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+		const sixtyDaysAgo = new Date(currentDate.getTime() - 60 * 24 * 60 * 60 * 1000);
 		const dailyHours = new Map<string, number>();
 
 		for (let useHour of equipmentHours) {
-			if (useHour.date < thirtyDaysAgo) continue;
+			if (useHour.date < sixtyDaysAgo) continue;
 			const dateStr = useHour.date.toISOString().slice(0, 10);
 			dailyHours.set(
 				dateStr,
@@ -56,7 +61,8 @@ export class NextMaintenanceService implements INextMaintenanceService {
 
 		const dailyHoursArray = Array.from(dailyHours.values());
 		const totalHours = dailyHoursArray.reduce((total, hours) => total + hours, 0);
-		return Math.ceil(totalHours / dailyHoursArray.length);
+		const averageUseHours = Math.ceil(totalHours / dailyHoursArray.length) || 12;
+		return averageUseHours;
 	}
 
 	private calculateNextMaintenances(maintenanceFrequencies: MaintenanceFrequencyInstance[], equipment: EquipmentInstance, averageUseHours: number): NextMaintenanceCreationAttributes[] {

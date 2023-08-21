@@ -6,8 +6,7 @@ export interface IEquipmentController {
 	getEquipmentByIdOrCode(req: Request, res: Response): Promise<Response<EquipmentInstance>>;
 	postNewEquipment(req: Request, res: Response): Promise<Response<EquipmentInstance>>;
 	deleteEquipment(req: Request, res: Response): Promise<Response<number>>;
-	updateEquipment(req: Request, res: Response): Promise<Response<[number, EquipmentInstance[]]>>;
-	addUseHours(req: Request, res: Response): Promise<Response<EquipmentInstance>>;
+	updateEquipment(req: Request, res: Response): Promise<Response<[number]>>;
 	addUseHoursInBulk(req: Request, res: Response): Promise<Response<EquipmentInstance>>;
 	addLubricationSheetToEquipment(req: Request, res: Response): Promise<Response<EquipmentInstance>>;
 	addEquipmentToSite(req: Request, res: Response): Promise<Response<EquipmentInstance>>;

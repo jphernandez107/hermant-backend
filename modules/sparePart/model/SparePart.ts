@@ -1,9 +1,8 @@
 import { Model, Sequelize, DataTypes, NOW } from "sequelize";
 import { SparePartAttributes, SparePartCreationAttributes, SparePartInstance } from "./ISparePart";
-import { IModel } from "modules/interfaces/IModel";
 
 
-export class SparePart extends Model<SparePartAttributes, SparePartCreationAttributes> implements SparePartInstance, IModel {
+export class SparePart extends Model<SparePartAttributes, SparePartCreationAttributes> implements SparePartInstance {
 	public id: number;
 	public internal_code: string;
 	public external_code: string;
@@ -18,7 +17,7 @@ export class SparePart extends Model<SparePartAttributes, SparePartCreationAttri
 	public created_at: Date;
 	public updated_at: Date;
 
-	public associate(models: any): void {
+	public static associate(models: any): void {
 		SparePart.hasMany(models.lubrication_sheet_spare_part, {
 			as: 'lubrication_sheet_spare_parts',
 			foreignKey: "spare_part_id"
@@ -29,7 +28,7 @@ export class SparePart extends Model<SparePartAttributes, SparePartCreationAttri
 		});
 	}
 
-	public initModel(sequelize: Sequelize): void {
+	public static initModel(sequelize: Sequelize) {
 		SparePart.init({
 			id: {
 				type: DataTypes.INTEGER,
@@ -85,5 +84,7 @@ export class SparePart extends Model<SparePartAttributes, SparePartCreationAttri
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		});
+
+		return SparePart;
 	}
 }

@@ -1,8 +1,7 @@
 import { Model, Sequelize, DataTypes, NOW } from "sequelize";
 import { LubricationSheetSparePartAttributes, LubricationSheetSparePartCreationAttributes, LubricationSheetSparePartInstance } from "./ILubricationSheetSparePart";
-import { IModel } from "modules/interfaces/IModel";
 
-export class LubricationSheetSparePart extends Model<LubricationSheetSparePartAttributes, LubricationSheetSparePartCreationAttributes> implements LubricationSheetSparePartInstance, IModel {
+export class LubricationSheetSparePart extends Model<LubricationSheetSparePartAttributes, LubricationSheetSparePartCreationAttributes> implements LubricationSheetSparePartInstance {
 	public id!: number;
 	public lubrication_sheet_id!: number;
 	public spare_part_id!: number;
@@ -11,7 +10,7 @@ export class LubricationSheetSparePart extends Model<LubricationSheetSparePartAt
 	public created_at!: Date;
 	public updated_at!: Date;
 
-	public associate(models: any): void {
+	public static associate(models: any): void {
 		LubricationSheetSparePart.belongsTo(models.spare_part, {
 			foreignKey: 'spare_part_id'
 		});
@@ -25,7 +24,7 @@ export class LubricationSheetSparePart extends Model<LubricationSheetSparePartAt
 		});
 	}
 
-	public initModel(sequelize: Sequelize): void {
+	public static initModel(sequelize: Sequelize) {
 		LubricationSheetSparePart.init({
 			id: {
 				type: DataTypes.INTEGER,
@@ -72,5 +71,7 @@ export class LubricationSheetSparePart extends Model<LubricationSheetSparePartAt
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		});
+
+		return LubricationSheetSparePart;
 	}
 }

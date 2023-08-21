@@ -1,34 +1,32 @@
+import { inject, injectable, singleton } from 'tsyringe';
 import { EquipmentCreationAttributes, EquipmentInstance } from '../model/IEquipment';
 import { EquipmentHourAddedInBulk, IEquipmentService, EquipmentMessages } from './IEquipmentService';
 import { IEquipmentRepository } from '../repository/IEquipmentRepository';
 import { EquipmentHourCreationAttributes, EquipmentHourCreationInBulkAttributes, EquipmentHourInstance } from '../model/IEquipmentHour';
 import { IEquipmentHourRepository } from '../repository/IEquipmentHourRepository';
-import { IConstructionSiteService, ConstructionSiteMessages } from 'modules/constructionSite/service/IConstructionSiteService';
-import { ConstructionSiteInstance } from 'modules/constructionSite/model/IConstructionSite';
-import { IMaintenanceService } from 'modules/maintenance/service/IMaintenanceService';
-import { INextMaintenanceService } from 'modules/maintenance/service/INextMaintenanceService';
-import { ILubricationSheetService, LubricationSheetMessages } from 'modules/lubricationSheet/service/ILubricationSheetService';
+import { IConstructionSiteService, ConstructionSiteMessages } from '../../constructionSite/service/IConstructionSiteService';
+import { ConstructionSiteInstance } from '../../constructionSite/model/IConstructionSite';
+import { INextMaintenanceService } from '../../maintenance/service/INextMaintenanceService';
+import { ILubricationSheetService, LubricationSheetMessages } from '../../lubricationSheet/service/ILubricationSheetService';
+import { EquipmentRepository } from '../repository/EquipmentRepository';
+import { EquipmentHourRepository } from '../repository/EquipmentHourRepository';
+import { ConstructionSiteService } from '../../constructionSite/service/ConstructionSiteService';
+import { NextMaintenanceService } from '../../maintenance/service/NextMaintenanceService';
+import { LubricationSheetService } from '../../lubricationSheet/service/LubricationSheetService';
+import '../../../utils/ArrayExtensions';
+import i18n from 'i18n';
 
+@singleton()
+@injectable()
 export class EquipmentService implements IEquipmentService {
-	private equipmentRepository: IEquipmentRepository;
-	private equipmentHourRepository: IEquipmentHourRepository;
-	private constructionSiteService: IConstructionSiteService;
-	private nextMaintenanceService: INextMaintenanceService;
-	private lubricationSheetService: ILubricationSheetService;
-
+	
 	constructor(
-		equipmentRepository: IEquipmentRepository, 
-		equipmentHourRepository: IEquipmentHourRepository, 
-		constructionSiteService: IConstructionSiteService, 
-		nextMaintenanceService: INextMaintenanceService,
-		lubricationSheetService: ILubricationSheetService
-	) {
-		this.equipmentRepository = equipmentRepository;
-		this.equipmentHourRepository = equipmentHourRepository;
-		this.constructionSiteService = constructionSiteService;
-		this.nextMaintenanceService = nextMaintenanceService;
-		this.lubricationSheetService = lubricationSheetService;
-	}
+		@inject(EquipmentRepository) private equipmentRepository: IEquipmentRepository,
+		@inject(EquipmentHourRepository) private equipmentHourRepository: IEquipmentHourRepository,
+		@inject(ConstructionSiteService) private constructionSiteService: IConstructionSiteService, 
+		@inject(NextMaintenanceService) private nextMaintenanceService: INextMaintenanceService,
+		@inject(LubricationSheetService) private lubricationSheetService: ILubricationSheetService
+	) {}
 
 	public async getAllEquipments(): Promise<EquipmentInstance[]> {
 		const equipments = await this.equipmentRepository.getAllEquipments();
@@ -38,7 +36,7 @@ export class EquipmentService implements IEquipmentService {
 
 	public async getEquipmentByIdOrCode(id: number | null, code: string | null): Promise<EquipmentInstance | null> {
 		let equipment: EquipmentInstance | null = null;
-		if (id) {
+		if (id && !Number.isNaN(id)) {
 			equipment = await this.equipmentRepository.getEquipmentById(id);
 		} else if (code) {
 			equipment = await this.equipmentRepository.getEquipmentByCode(code);
@@ -51,14 +49,18 @@ export class EquipmentService implements IEquipmentService {
 		return this.equipmentRepository.createEquipment(equipmentAttributes);
 	}
 
-	public async updateEquipment(id: number, equipmentAttributes: EquipmentCreationAttributes): Promise<[number, EquipmentInstance[]]> {
-		return this.equipmentRepository.updateEquipment(id, equipmentAttributes);
-	}
-
-	public async deleteEquipment(id: number | null, code: string | null): Promise<void> {
+	public async updateEquipment(id: number | null, code: string | null, equipmentAttributes: EquipmentCreationAttributes): Promise<[number, EquipmentInstance]> {
 		const equipment = await this.getEquipmentByIdOrCode(id, code);
 		if (!equipment) throw new Error(i18n.__(EquipmentMessages.EQUIPMENT_NOT_FOUND));
-		return this.equipmentRepository.deleteEquipment(equipment!);
+		const count = await this.equipmentRepository.updateEquipment(equipment.id, equipmentAttributes)
+		return [count[0], equipment];
+	}
+
+	public async deleteEquipment(id: number | null, code: string | null): Promise<EquipmentInstance> {
+		const equipment = await this.getEquipmentByIdOrCode(id, code);
+		if (!equipment) throw new Error(i18n.__(EquipmentMessages.EQUIPMENT_NOT_FOUND));
+		await this.equipmentRepository.deleteEquipment(equipment!);
+		return equipment;
 	}
 
 	public async getAllEquipmentHours(): Promise<EquipmentHourInstance[]> {
@@ -118,19 +120,15 @@ export class EquipmentService implements IEquipmentService {
 		if (!site) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
 		equipment.construction_site_id = site.id;
 		await this.equipmentRepository.saveEquipment(equipment);
-		return site;
+		return await this.constructionSiteService.getSiteByIdOrCode(site.id, site.code);
 	}
 	public async removeEquipmentFromSite(equipment: EquipmentInstance, siteId: number, siteCode: string): Promise<ConstructionSiteInstance> {
 		const principalSite = await this.getEquipmentByIdOrCode(null, "T01");
-		equipment.construction_site_id = principalSite.id || null; 
+		equipment.construction_site_id = principalSite?.id || null; 
 		await this.equipmentRepository.saveEquipment(equipment);
 		const site = await this.constructionSiteService.getSiteByIdOrCode(siteId, siteCode);
 		if (!site) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
 		return site;
-	}
-	public async resetEquipmentPartialHours(equipment: EquipmentInstance): Promise<EquipmentInstance> {
-		equipment.partial_hours = 0;
-		return this.equipmentRepository.saveEquipment(equipment);
 	}
 	public async getEquipmentHoursByEquipmentId(equipmentId: number): Promise<EquipmentHourInstance[]> {
 		return this.equipmentHourRepository.getEquipmentHoursByEquipmentId(equipmentId);
@@ -168,6 +166,7 @@ export class EquipmentService implements IEquipmentService {
 	}
 
 	private processEquipments(equipment: EquipmentInstance): void {
+		if (!equipment) return;
 		const firstMaintenance = equipment.next_maintenances.map((maint) => maint.maintenance_date);
 		const next_maintenance: Date = firstMaintenance.minDate();
 		equipment.next_maintenance = next_maintenance;

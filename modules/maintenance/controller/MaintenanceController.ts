@@ -1,4 +1,4 @@
-import { BaseController } from "modules/interfaces/BaseController";
+import { BaseController } from "../../interfaces/BaseController";
 import { IMaintenanceController } from "./IMaintenanceController";
 import { IMaintenanceService, MaintenanceMessages } from "../service/IMaintenanceService";
 import { Request, Response } from "express";
@@ -6,28 +6,26 @@ import { MaintenanceCreationAttributes, MaintenanceInstance } from "../model/IMa
 import { MaintenanceSparePartCreationAttributes, MaintenanceSparePartInstance } from "../model/IMaintenanceSparePart";
 import { NextMaintenanceInstance } from "../model/INextMaintenance";
 import { INextMaintenanceService, NextMaintenanceMessages } from "../service/INextMaintenanceService";
+import { container } from "tsyringe";
+import { MaintenanceService } from "../service/MaintenanceService";
+import { NextMaintenanceService } from "../service/NextMaintenanceService";
+import i18n from 'i18n';
 
-class MaintenanceController extends BaseController implements IMaintenanceController {
-	private maintenanceService: IMaintenanceService;
-	private nextMaintenanceService: INextMaintenanceService;
+export class MaintenanceController extends BaseController implements IMaintenanceController {
+	private maintenanceService: IMaintenanceService = container.resolve<IMaintenanceService>(MaintenanceService);
+	private nextMaintenanceService: INextMaintenanceService = container.resolve<INextMaintenanceService>(NextMaintenanceService);
 
-	constructor(maintenanceService: IMaintenanceService, nextMaintenanceService: INextMaintenanceService) {
-		super();
-		this.maintenanceService = maintenanceService;
-		this.nextMaintenanceService = nextMaintenanceService;
-	}
-
-	public async getMaintenancesList(req: Request, res: Response): Promise<Response<MaintenanceInstance[]>> {
+	public getMaintenancesList = async (req: Request, res: Response): Promise<Response<MaintenanceInstance[]>> => {
 		try {
 			const maintenances = await this.maintenanceService.getAllMaintenances();
 			if (!maintenances) throw new Error(i18n.__(MaintenanceMessages.MAINTENANCE_NOT_FOUND));
 			return res.status(200).json(maintenances);
 		} catch (error) {
-			return this.catchError(res, error, 404, i18n.__(MaintenanceMessages.MAINTENANCE_NOT_FOUND));
+			return this.catchError(res, 404, error, i18n.__(MaintenanceMessages.MAINTENANCE_NOT_FOUND));
 		}
 	}
 
-	public async postNewMaintenance(req: Request, res: Response): Promise<Response<MaintenanceInstance>> {
+	public postNewMaintenance = async (req: Request, res: Response): Promise<Response<MaintenanceInstance>> => {
 		try {
 			const maintenanceAttributes = this.parseMaintenanceFromBody(req);
 			const maintenance = await this.maintenanceService.createMaintenance(maintenanceAttributes);
@@ -37,17 +35,17 @@ class MaintenanceController extends BaseController implements IMaintenanceContro
 				maintenance: maintenance
 			});
 		} catch (error) {
-			return this.catchError(res, error, 404, i18n.__(MaintenanceMessages.ERROR_CREATING_MAINTENANCE));
+			return this.catchError(res, 500, error, i18n.__(MaintenanceMessages.ERROR_CREATING_MAINTENANCE));
 		}
 	}
 
-	public async getNextMaintenancesList(req: Request, res: Response): Promise<Response<NextMaintenanceInstance[]>> {
+	public getNextMaintenancesList = async (req: Request, res: Response): Promise<Response<NextMaintenanceInstance[]>> => {
 		try {
 			const nextMaintenances = await this.nextMaintenanceService.getAllNextMaintenances();
 			if (!nextMaintenances) throw new Error(i18n.__(NextMaintenanceMessages.NEXT_MAINTENANCE_NOT_FOUND));
 			return res.status(200).json(nextMaintenances);
 		} catch (error) {
-			return this.catchError(res, error, 404, i18n.__(NextMaintenanceMessages.NEXT_MAINTENANCE_NOT_FOUND));
+			return this.catchError(res, 404, error, i18n.__(NextMaintenanceMessages.NEXT_MAINTENANCE_NOT_FOUND));
 		}
 	}
 

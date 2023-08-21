@@ -1,18 +1,16 @@
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import { IConstructionSiteController } from './IConstructionSiteController';
 import { IConstructionSiteService, ConstructionSiteMessages } from '../service/IConstructionSiteService';
 import { ConstructionSiteCreationAttributes, ConstructionSiteInstance } from '../model/IConstructionSite';
-import { BaseController } from 'modules/interfaces/BaseController';
+import { BaseController } from '../../interfaces/BaseController';
+import { ConstructionSiteService } from '../service/ConstructionSiteService';
+import i18n from 'i18n';
 
 export class ConstructionSiteController extends BaseController implements IConstructionSiteController {
-	private service: IConstructionSiteService;
+	private service: IConstructionSiteService = container.resolve<IConstructionSiteService>(ConstructionSiteService);
 
-	constructor(service: IConstructionSiteService) {
-		super();
-		this.service = service;
-	}
-
-	public async getSitesList(req: Request, res: Response): Promise<Response<ConstructionSiteInstance[]>> {
+	public getSitesList = async (req: Request, res: Response): Promise<Response<ConstructionSiteInstance[]>> => {
 		try {
 			const sites = await this.service.getAllSites();
 			if (!sites) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
@@ -22,7 +20,7 @@ export class ConstructionSiteController extends BaseController implements IConst
 		}
 	}
 
-	public async getSiteByIdOrCode(req: Request, res: Response): Promise<Response<ConstructionSiteInstance>> {
+	public getSiteByIdOrCode = async (req: Request, res: Response): Promise<Response<ConstructionSiteInstance>> => {
 		try {
 			const site = await this.findSiteByIdOrCode(req);
 			if (!site) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
@@ -32,7 +30,7 @@ export class ConstructionSiteController extends BaseController implements IConst
 		}
 	}
 
-	async postNewSite(req: Request, res: Response): Promise<Response<ConstructionSiteInstance>> {
+	postNewSite = async (req: Request, res: Response): Promise<Response<ConstructionSiteInstance>> => {
 		try {
 			const siteAttributes = this.parseSiteFromBody(req);
 			const site = await this.service.createSite(siteAttributes);
@@ -46,7 +44,7 @@ export class ConstructionSiteController extends BaseController implements IConst
 		}
 	}
 
-	async deleteSite(req: Request, res: Response): Promise<Response<number>> {
+	deleteSite = async (req: Request, res: Response): Promise<Response<number>> => {
 		try {
 			const id = req.body.id as number || null;
 			const code = req.body.code as string || null;
@@ -59,10 +57,10 @@ export class ConstructionSiteController extends BaseController implements IConst
 		}
 	}
 
-	async updateSite(req: Request, res: Response): Promise<Response<[number, ConstructionSiteInstance[]]>> {
+	updateSite = async (req: Request, res: Response): Promise<Response<[number, ConstructionSiteInstance[]]>> => {
 		try {
 			const siteAttributes = this.parseSiteFromBody(req, false);
-			const id: number = Number.parseInt(req.params.id);
+			const id: number = Number.parseInt(req.query.id as string);
 			const sites = await this.service.updateSite(id, siteAttributes);
 			if (!sites || sites[0] === 0) throw new Error(i18n.__(ConstructionSiteMessages.ERROR_UPDATING_SITE));
 			return res.status(200).json({ 
@@ -74,7 +72,7 @@ export class ConstructionSiteController extends BaseController implements IConst
 		}
 	}
 
-	public async findSiteByIdOrCode(req: Request): Promise<ConstructionSiteInstance | null> {
+	public findSiteByIdOrCode = async (req: Request): Promise<ConstructionSiteInstance | null> => {
 		let id: number | null = null;
 		let code: string | null = null;
 

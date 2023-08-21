@@ -1,8 +1,7 @@
 import { Sequelize, DataTypes, Model, NOW } from 'sequelize';
 import { EquipmentHourAttributes, EquipmentHourCreationAttributes, EquipmentHourInstance } from './IEquipmentHour';
-import { IModel } from 'modules/interfaces/IModel';
 
-export class EquipmentHour extends Model<EquipmentHourAttributes, EquipmentHourCreationAttributes> implements EquipmentHourAttributes, IModel {
+export class EquipmentHour extends Model<EquipmentHourAttributes, EquipmentHourCreationAttributes> implements EquipmentHourAttributes {
 	public id!: number;
 	public hours_to_add!: number;
 	public total_hours!: number;
@@ -15,7 +14,7 @@ export class EquipmentHour extends Model<EquipmentHourAttributes, EquipmentHourC
 	public created_at!: Date;
 	public updated_at!: Date;
 
-	public initModel(sequelize: Sequelize): void {
+	public static initModel(sequelize: Sequelize) {
 		EquipmentHour.init({
 			id: {
 				type: DataTypes.INTEGER,
@@ -70,9 +69,11 @@ export class EquipmentHour extends Model<EquipmentHourAttributes, EquipmentHourC
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		});
+		
+		return EquipmentHour;
 	}
 
-	public associate(models: any): void {
+	public static associate(models: any): void {
 		EquipmentHour.belongsTo(models.equipment, {
 			as: 'equipment',
 			foreignKey: "equipment_id"

@@ -3,29 +3,30 @@ import { LubricationSheetSparePartCreationAttributes, LubricationSheetSparePartI
 import { ILubricationSheetRepository } from "../repository/ILubricationSheetRepository";
 import { ILubricationSheetService, LubricationSheetMessages } from "./ILubricationSheetService";
 import { ILubricationSheetSparePartRepository } from "../repository/ILubricationSheetSparePartRepository";
-import { EquipmentMessages, IEquipmentService } from "modules/equipment/service/IEquipmentService";
-import { MaintenanceFrequencyInstance } from "modules/maintenance/model/IMaintenanceFrequency";
-import { IMaintenanceService } from "modules/maintenance/service/IMaintenanceService";
-import { INextMaintenanceService } from "modules/maintenance/service/INextMaintenanceService";
+import { EquipmentMessages } from "../../equipment/service/IEquipmentService";
+import { MaintenanceFrequencyInstance } from "../../maintenance/model/IMaintenanceFrequency";
+import { IMaintenanceService } from "../../maintenance/service/IMaintenanceService";
+import { INextMaintenanceService } from "../../maintenance/service/INextMaintenanceService";
+import { LubricationSheetRepository } from "../repository/LubricationSheetRepository";
+import { LubricationSheetSparePartRepository } from "../repository/LubricationSheetSparePartRepository";
+import { inject, injectable, singleton } from "tsyringe";
+import { MaintenanceService } from "../../maintenance/service/MaintenanceService";
+import { NextMaintenanceService } from "../../maintenance/service/NextMaintenanceService";
+import { EquipmentRepository } from "../../equipment/repository/EquipmentRepository";
+import { IEquipmentRepository } from "../../equipment/repository/IEquipmentRepository";
+import i18n from 'i18n';
 
+@singleton()
+@injectable()
 export class LubricationSheetService implements ILubricationSheetService {
-	private lubricationSheetRepository: ILubricationSheetRepository;
-	private lubricationSheetSparePartRepository: ILubricationSheetSparePartRepository;
-	private maintenanceService: IMaintenanceService;
-	private equipmentService: IEquipmentService;
-	private nextMaintenanceService: INextMaintenanceService;
-
-	constructor(lubricationSheetRepository: ILubricationSheetRepository, 
-				lubricationSheetSparePartRepository: ILubricationSheetSparePartRepository, 
-				maintenanceService: IMaintenanceService,
-				equipmentService: IEquipmentService,
-				nextMaintenanceService: INextMaintenanceService) {
-		this.lubricationSheetRepository = lubricationSheetRepository;
-		this.lubricationSheetSparePartRepository = lubricationSheetSparePartRepository;
-		this.maintenanceService = maintenanceService;
-		this.equipmentService = equipmentService;
-		this.nextMaintenanceService = nextMaintenanceService;
-	}
+	
+	constructor(
+		@inject(LubricationSheetRepository) private lubricationSheetRepository: ILubricationSheetRepository,
+		@inject(LubricationSheetSparePartRepository) private lubricationSheetSparePartRepository: ILubricationSheetSparePartRepository,
+		@inject(MaintenanceService) private maintenanceService: IMaintenanceService,
+		@inject(EquipmentRepository) private equipmentRepository: IEquipmentRepository,
+		@inject(NextMaintenanceService) private nextMaintenanceService: INextMaintenanceService
+	) {}
 
 	public async getAllLubricationSheets(): Promise<LubricationSheetInstance[]> {
 		return this.lubricationSheetRepository.getAllLubricationSheets();
@@ -55,7 +56,7 @@ export class LubricationSheetService implements ILubricationSheetService {
 
 	public async addSparePartsToLubricationSheet(lubricationSheetAttributes: LubricationSheetCreationAttributes): Promise<LubricationSheetInstance> {
 		this.clearLubricationSheet(lubricationSheetAttributes.id);
-		const equipment = await this.equipmentService.getEquipmentByIdOrCode(null, lubricationSheetAttributes.equipment_code);
+		const equipment = await this.equipmentRepository.getEquipmentByCode(lubricationSheetAttributes.equipment_code);
 		if (!equipment) throw new Error(i18n.__(EquipmentMessages.EQUIPMENT_NOT_FOUND));
 		const sheet = await this.findOrCreateLubricationSheet(lubricationSheetAttributes.id);
 		if (!sheet) throw new Error(LubricationSheetMessages.ERROR_CREATING_LUBRICATION_SHEET);

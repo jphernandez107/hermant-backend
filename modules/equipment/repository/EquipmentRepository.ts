@@ -1,7 +1,9 @@
 import { EquipmentCreationAttributes, EquipmentInstance } from '../model/IEquipment';
 import { EquipmentIncludes, IEquipmentRepository } from './IEquipmentRepository';
 import { Equipment } from '../model/Equipment';
+import { singleton } from 'tsyringe';
 
+@singleton()
 export class EquipmentRepository implements IEquipmentRepository {
 
 	public async getAllEquipments(): Promise<EquipmentInstance[]> {
@@ -32,10 +34,10 @@ export class EquipmentRepository implements IEquipmentRepository {
 		return Equipment.create(equipmentAttributes);
 	}
 
-	public async updateEquipment(id: number, equipmentAttributes: EquipmentCreationAttributes): Promise<[number, EquipmentInstance[]]> {
+	public async updateEquipment(id: number, equipmentAttributes: EquipmentCreationAttributes): Promise<[number]> {
 		return Equipment.update(equipmentAttributes, {
 			where: { id: id },
-			returning: true
+			returning: false
 		});
 	}
 
@@ -45,5 +47,9 @@ export class EquipmentRepository implements IEquipmentRepository {
 
 	public async deleteEquipment(equipment: EquipmentInstance): Promise<void> {
 		return equipment.destroy();
+	}
+	public async resetEquipmentPartialHours(equipment: EquipmentInstance): Promise<EquipmentInstance> {
+		equipment.partial_hours = 0;
+		return this.saveEquipment(equipment);
 	}
 }

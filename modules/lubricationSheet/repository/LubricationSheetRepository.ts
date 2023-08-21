@@ -1,7 +1,9 @@
+import { singleton } from "tsyringe";
 import { LubricationSheetCreationAttributes, LubricationSheetInstance } from "../model/ILubricationSheet";
 import { LubricationSheet } from "../model/LubricationSheet";
 import { ILubricationSheetRepository, LubricationSheetIncludes } from "./ILubricationSheetRepository";
 
+@singleton()
 export class LubricationSheetRepository implements ILubricationSheetRepository {
 	public async getAllLubricationSheets(): Promise<LubricationSheetInstance[]> {
 		return LubricationSheet.findAll({

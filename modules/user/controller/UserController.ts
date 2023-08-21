@@ -2,14 +2,18 @@ import { Request, Response } from 'express';
 import { IUserController } from './IUserController';
 import { IUserService, UserMessages } from '../service/IUserService';
 import { UserCreationAttributes, UserInstance } from '../model/IUser';
-import { BaseController } from 'modules/interfaces/BaseController';
+import { BaseController } from '../../interfaces/BaseController';
+import { autoInjectable, container, inject } from 'tsyringe';
+import { UserService } from '../service/UserService';
+import i18n from 'i18n';
 
+@autoInjectable()
 export class UserController extends BaseController implements IUserController {
-	private service: IUserService;
 
-	constructor(userService: IUserService) {
+	constructor(
+		@inject(UserService) private service: IUserService
+	) {
 		super();
-		this.service = userService;
 	}
 
 	public getUsersList = async (req: Request, res: Response): Promise<Response<UserInstance[]>> => {
@@ -24,7 +28,7 @@ export class UserController extends BaseController implements IUserController {
 
 	public getUserById = async (req: Request, res: Response): Promise<Response<UserInstance>> => {
 		try {
-			const user = await this.service.getUserById(Number(req.params.id));
+			const user = await this.service.getUserById(Number(req.query.id));
 			if (!user) throw new Error(i18n.__(UserMessages.USER_NOT_FOUND));
 			return res.status(200).json(user);
 		} catch (error) {
@@ -62,7 +66,7 @@ export class UserController extends BaseController implements IUserController {
 		try {
 			const user = await this.service.getUserById(Number(req.params.id));
 			if (!user) throw new Error(i18n.__(UserMessages.USER_NOT_FOUND));
-			await this.service.deleteUser(Number(req.params.id));
+			await this.service.deleteUser(user.id);
 			return res.status(200).json({ 
 				message: i18n.__(UserMessages.USER_DELETED),
 				user: user,
@@ -117,11 +121,12 @@ export class UserController extends BaseController implements IUserController {
 			dni,
 			password,
 			first_name,
-			last_name
+			last_name,
+			role
 		} = req.body;
 	
 		// Check for required fields
-		if (isCreating && (!dni || !password || !first_name || !last_name)) {
+		if (isCreating && (!dni || !password || !first_name || !last_name || !role)) {
 			throw Error('Missing required attributes');
 		}
 	
@@ -130,6 +135,7 @@ export class UserController extends BaseController implements IUserController {
 			password: password as string,
 			first_name: first_name as string,
 			last_name: last_name as string,
+			role:role,
 			active: true
 		};
 	

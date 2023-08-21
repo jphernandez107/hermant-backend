@@ -1,7 +1,9 @@
+import { singleton } from "tsyringe";
 import { NextMaintenanceCreationAttributes, NextMaintenanceInstance } from "../model/INextMaintenance";
 import { NextMaintenance } from "../model/NextMaintenance";
 import { INextMaintenanceRepository, NextMaintenanceIncludes } from "./INextMaintenanceRepository";
 
+@singleton()
 export class NextMaintenanceRepository implements INextMaintenanceRepository {
 	public async getNextMaintenancesList(): Promise<NextMaintenanceInstance[]> {
 		return NextMaintenance.findAll({

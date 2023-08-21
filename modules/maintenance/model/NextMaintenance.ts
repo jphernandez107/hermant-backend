@@ -9,7 +9,7 @@ export class NextMaintenance extends Model<NextMaintenanceAttributes, NextMainte
 	public created_at!: Date;
 	public updated_at!: Date;
 
-	public associate(models: any): void {
+	public static associate(models: any): void {
 		NextMaintenance.belongsTo(models.equipment, {
 			as: 'equipment',
 			foreignKey: 'equipment_id'
@@ -20,7 +20,7 @@ export class NextMaintenance extends Model<NextMaintenanceAttributes, NextMainte
 		});
 	}
 	
-	public initModel(sequelize: any): void {
+	public static initModel(sequelize: any) {
 		NextMaintenance.init({
 			id: {
 				type: DataTypes.INTEGER,
@@ -63,6 +63,8 @@ export class NextMaintenance extends Model<NextMaintenanceAttributes, NextMainte
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		});
+
+		return NextMaintenance;
 	}
 
 	

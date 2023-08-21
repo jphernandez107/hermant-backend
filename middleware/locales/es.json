@@ -47,7 +47,7 @@
 	"ERROR_CREATING_MAINTENANCE_FREQUENCIES": "Error al crear frecuencias de mantenimiento.",
 	"NEXT_MAINTENANCE_NOT_FOUND": "No se encontraron proximos mantenimientos.",
 
-	"SPARE_PART_NOT_FOUND": "Repuesto no encontradp.",
+	"SPARE_PART_NOT_FOUND": "Repuesto no encontrado.",
 	"ERROR_CREATING_SPARE_PART": "Error al crear el repuesto.",
 	"SPARE_PART_CREATED": "Repuesto creado con éxito.",
 	"ERROR_DELETING_SPARE_PART": "Error al eliminar el repuesto.",

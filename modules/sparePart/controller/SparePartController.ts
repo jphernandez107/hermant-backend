@@ -1,37 +1,35 @@
-import { BaseController } from "modules/interfaces/BaseController";
+import { BaseController } from "../../interfaces/BaseController";
 import { ISparePartController } from "./ISparePartController";
 import { ISparePartService, SparePartMessages } from "../service/ISparePartService";
 import { Request, Response } from "express";
 import { SparePartCreationAttributes, SparePartInstance } from "../model/ISparePart";
+import { container } from "tsyringe";
+import { SparePartService } from "../service/SparePartService";
+import i18n from 'i18n';
 
-class SparePartController extends BaseController implements ISparePartController {
-	private sparePartService: ISparePartService;
+export class SparePartController extends BaseController implements ISparePartController {
+	private sparePartService: ISparePartService = container.resolve<ISparePartService>(SparePartService);
 
-	constructor(sparePartService: ISparePartService) {
-		super();
-		this.sparePartService = sparePartService;
-	}
-
-	public async getSparePartList(req: Request, res: Response): Promise<Response<SparePartInstance[]>> {
+	public getSparePartList = async (req: Request, res: Response): Promise<Response<SparePartInstance[]>> => {
 		try {
 			const spareParts = await this.sparePartService.getAllSpareParts();
 			if (!spareParts) throw new Error(i18n.__(SparePartMessages.SPARE_PART_NOT_FOUND));
 			return res.status(200).json(spareParts);
 		} catch (error) {
-			return this.catchError(res, error, 404, i18n.__(SparePartMessages.SPARE_PART_NOT_FOUND));
+			return this.catchError(res, 404, error, i18n.__(SparePartMessages.SPARE_PART_NOT_FOUND));
 		}
 	}
-	public async getSparePartByIdOrExternalCode(req: Request, res: Response): Promise<Response<SparePartInstance>> {
+	public getSparePartByIdOrExternalCode = async (req: Request, res: Response): Promise<Response<SparePartInstance>> => {
 		try {
-			const { id, externalCode } = req.params;
+			const { id, externalCode } = req.query;
 			const sparePart = await this.findSparePartByIdOrExternalCode(req);
 			if (!sparePart) throw new Error(i18n.__(SparePartMessages.SPARE_PART_NOT_FOUND));
 			return res.status(200).json(sparePart);
 		} catch (error) {
-			return this.catchError(res, error, 404, i18n.__(SparePartMessages.SPARE_PART_NOT_FOUND));
+			return this.catchError(res, 404, error, i18n.__(SparePartMessages.SPARE_PART_NOT_FOUND));
 		}
 	}
-	public async postNewSparePart(req: Request, res: Response): Promise<Response<SparePartInstance>> {
+	public postNewSparePart = async (req: Request, res: Response): Promise<Response<SparePartInstance>> => {
 		try {
 			const sparePartAttributes = this.parseSparePartFromBody(req);
 			const sparePart = await this.sparePartService.createSparePart(sparePartAttributes);
@@ -41,25 +39,25 @@ class SparePartController extends BaseController implements ISparePartController
 				sparePart: sparePart
 			});
 		} catch (error) {
-			return this.catchError(res, error, 500, i18n.__(SparePartMessages.ERROR_CREATING_SPARE_PART));
+			return this.catchError(res, 500, error, i18n.__(SparePartMessages.ERROR_CREATING_SPARE_PART));
 		}
 	}
-	public async deleteSparePart(req: Request, res: Response): Promise<Response<void>> {
+	public deleteSparePart = async (req: Request, res: Response): Promise<Response<void>> => {
 		try {
-			const id = parseInt(req.params.id) || null;
-			const externalCode = req.params.externalCode as string || null;
+			const id = parseInt(req.query.id as string) || null;
+			const externalCode = req.query.externalCode as string || null;
 			await this.sparePartService.deleteSparePart(id, externalCode);
 			return res.status(200).json({
 				message: i18n.__(SparePartMessages.SPARE_PART_DELETED),
 			});
 		} catch (error) {
-			return this.catchError(res, error, 500, i18n.__(SparePartMessages.ERROR_DELETING_SPARE_PART));
+			return this.catchError(res, 500, error, i18n.__(SparePartMessages.ERROR_DELETING_SPARE_PART));
 		}
 	}
-	public async updateSparePart(req: Request, res: Response): Promise<Response<[number, SparePartInstance[]]>> {
+	public updateSparePart = async (req: Request, res: Response): Promise<Response<[number, SparePartInstance[]]>> => {
 		try {
 			const equipmentAttributes = this.parseSparePartFromBody(req, false);
-			const id = parseInt(req.params.id) || null;
+			const id = parseInt(req.query.id as string) || null;
 			const spareParts = await this.sparePartService.updateSparePart(id, equipmentAttributes);
 			if (!spareParts || spareParts[0] === 0) throw new Error(i18n.__(SparePartMessages.ERROR_UPDATING_SPARE_PART));
 			return res.status(200).json({
@@ -67,7 +65,7 @@ class SparePartController extends BaseController implements ISparePartController
 				sparePart: spareParts[1]
 			});
 		} catch (error) {
-			return this.catchError(res, error, 500, i18n.__(SparePartMessages.ERROR_UPDATING_SPARE_PART));
+			return this.catchError(res, 500, error, i18n.__(SparePartMessages.ERROR_UPDATING_SPARE_PART));
 		}
 	}
 

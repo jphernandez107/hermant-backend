@@ -1,13 +1,17 @@
+import { inject, singleton, injectable } from "tsyringe";
 import { SparePartInstance } from "../model/ISparePart";
 import { ISparePartRepository } from "../repository/ISparePartRepository";
+import { SparePartRepository } from "../repository/SparePartRepository";
 import { ISparePartService, SparePartMessages } from "./ISparePartService";
+import i18n from 'i18n';
 
+@singleton()
+@injectable()
 export class SparePartService implements ISparePartService {
-	private sparePartRepository: ISparePartRepository;
-
-	constructor(sparePartRepository: ISparePartRepository) {
-		this.sparePartRepository = sparePartRepository;
-	}
+	
+	constructor(
+		@inject(SparePartRepository) private sparePartRepository: ISparePartRepository
+	){}
 
 	public async getAllSpareParts(): Promise<SparePartInstance[]> {
 		return this.sparePartRepository.getAllSpareParts();

@@ -1,4 +1,4 @@
-import { NextMaintenanceInstance } from 'modules/maintenance/model/INextMaintenance';
+import { NextMaintenanceInstance } from '../../maintenance/model/INextMaintenance';
 import { Model, Optional } from 'sequelize';
 
 export interface EquipmentAttributes {

@@ -1,8 +1,7 @@
 import { Model, DataTypes, Sequelize, NOW } from 'sequelize';
-import { IModel } from '../../interfaces/IModel';
 import { EquipmentAttributes, EquipmentCreationAttributes, EquipmentInstance } from './IEquipment';
 
-export class Equipment extends Model<EquipmentAttributes, EquipmentCreationAttributes> implements EquipmentInstance, IModel {
+export class Equipment extends Model<EquipmentAttributes, EquipmentCreationAttributes> implements EquipmentInstance {
 	public id!: number;
 	public code!: string;
 	public brand!: string;
@@ -19,12 +18,13 @@ export class Equipment extends Model<EquipmentAttributes, EquipmentCreationAttri
 	public price?: number;
 	public observations?: string;
 	public site_importance?: number;
+	public next_maintenance?: Date;
 	public construction_site_id?: number;
 	public lubrication_sheet_id?: number;
 	public created_at!: Date;
 	public updated_at!: Date;
 
-	public associate(models: any) {
+	public static associate(models: any) {
 		Equipment.belongsTo(models.construction_site, {
 			as: 'construction_site',
 			foreignKey: 'construction_site_id',
@@ -46,7 +46,7 @@ export class Equipment extends Model<EquipmentAttributes, EquipmentCreationAttri
 		});
 	}
 
-	public initModel(sequelize: Sequelize) {
+	public static initModel(sequelize: Sequelize) {
 		Equipment.init({
 			id: {
 				type: DataTypes.INTEGER,
@@ -101,6 +101,9 @@ export class Equipment extends Model<EquipmentAttributes, EquipmentCreationAttri
 			},
 			site_importance: {
 				type: DataTypes.INTEGER
+			},
+			next_maintenance: {
+				type: DataTypes.VIRTUAL
 			},
 			construction_site_id: {
 				type: DataTypes.INTEGER,

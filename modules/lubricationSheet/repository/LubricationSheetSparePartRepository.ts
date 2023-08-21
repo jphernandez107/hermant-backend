@@ -1,8 +1,10 @@
-import { MaintenanceFrequencyInstance } from "modules/maintenance/model/IMaintenanceFrequency";
+import { MaintenanceFrequencyInstance } from "../../maintenance/model/IMaintenanceFrequency";
 import { LubricationSheetSparePartCreationAttributes } from "../model/ILubricationSheetSparePart";
 import { LubricationSheetSparePart } from "../model/LubricationSheetSparePart";
 import { ILubricationSheetSparePartRepository } from "./ILubricationSheetSparePartRepository";
+import { singleton } from "tsyringe";
 
+@singleton()
 export class LubricationSheetSparePartRepository implements ILubricationSheetSparePartRepository {
 	public async deleteByLubricationSheetId(lubricationSheetId: number): Promise<number> {
 		return LubricationSheetSparePart.destroy({

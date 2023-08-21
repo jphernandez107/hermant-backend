@@ -1,4 +1,4 @@
-import { EquipmentInstance } from "modules/equipment/model/IEquipment";
+import { EquipmentInstance } from "../../equipment/model/IEquipment";
 import { NextMaintenanceInstance } from "../model/INextMaintenance";
 
 export interface INextMaintenanceService {

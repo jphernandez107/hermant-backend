@@ -1,14 +1,16 @@
+import { singleton } from "tsyringe";
 import { MaintenanceFrequencyInstance } from "../model/IMaintenanceFrequency";
 import { MaintenanceFrequency } from "../../maintenance/model/MaintenanceFrequency";
 import { IMaintenanceFrequencyRepository } from "./IMaintenanceFrequecyRepository";
 
+@singleton()
 export class MaintenanceFrequencyRepository implements IMaintenanceFrequencyRepository {
 
 	public async createMaintenanceFrequenciesInBulk(frequencies: number[], lubricationSheetId: number): Promise<MaintenanceFrequencyInstance[]> {
 		return MaintenanceFrequency.bulkCreate(frequencies.map(frequency => {
 			return {
 				lubrication_sheet_id: lubricationSheetId,
-				frequency_id: frequency
+				frequency: frequency
 			}
 		}));
 	}
@@ -19,6 +21,10 @@ export class MaintenanceFrequencyRepository implements IMaintenanceFrequencyRepo
 				lubrication_sheet_id: lubricationSheetId
 			}
 		});
+	}
+
+	public async deleteMaintenanceFrequency(maintenanceFrequency: MaintenanceFrequencyInstance): Promise<void> {
+		return maintenanceFrequency.destroy();
 	}
 
 	public async getMaintenanceFrequencyByLubricationSheetIdAndFrequency(lubricationSheetId: number, frequency: number): Promise<MaintenanceFrequencyInstance | null> {

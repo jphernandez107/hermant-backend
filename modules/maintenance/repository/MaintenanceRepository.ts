@@ -1,7 +1,9 @@
+import { singleton } from "tsyringe";
 import { MaintenanceCreationAttributes, MaintenanceInstance } from "../model/IMaintenance";
 import { Maintenance } from "../model/Maintenance";
 import { IMaintenanceRepository, MaintenanceIncludes } from "./IMaintenanceRepository";
 
+@singleton()
 export class MaintenanceRepository implements IMaintenanceRepository {
 	public async getAllMaintenances(): Promise<MaintenanceInstance[]> {
 		return Maintenance.findAll({

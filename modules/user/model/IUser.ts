@@ -16,6 +16,6 @@ export interface UserAttributes {
 	active: boolean | true;
 }
 
-export interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'last_login' | 'password_reset_token' | 'password_reset_token_expiry' | 'password_salt' | 'role' | 'updated_at' | 'created_at'> {}
-export interface UserUpdateAttributes extends Optional<UserCreationAttributes, 'dni' | 'first_name'| 'last_name' | 'password'> {}
+export interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'last_login' | 'password_reset_token' | 'password_reset_token_expiry' | 'password_salt' | 'updated_at' | 'created_at'> {}
+export interface UserUpdateAttributes extends Optional<UserCreationAttributes, 'dni' | 'first_name'| 'last_name' | 'password' | 'role'> {}
 export type UserInstance = UserAttributes & Model<UserAttributes, UserCreationAttributes>;

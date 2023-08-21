@@ -2,7 +2,9 @@
 import { User } from '../model/User';
 import { UserInstance, UserCreationAttributes, UserUpdateAttributes } from '../model/IUser';
 import { IUserRepository } from './IUserRepository';
+import { singleton } from 'tsyringe';
 
+@singleton()
 export class UserRepository implements IUserRepository {
 	public async getUsersList(): Promise<UserInstance[]> {
 		return await User.findAll();
@@ -39,4 +41,3 @@ export class UserRepository implements IUserRepository {
 		return await user.save();
 	}
 }
-  

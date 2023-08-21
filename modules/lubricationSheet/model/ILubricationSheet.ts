@@ -1,6 +1,6 @@
 import { Model, Optional } from "sequelize";
 import { LubricationSheetSparePartCreationAttributes } from "./ILubricationSheetSparePart";
-import { EquipmentInstance } from "modules/equipment/model/IEquipment";
+import { EquipmentInstance } from "../../equipment/model/IEquipment";
 
 export interface LubricationSheetAttributes {
 	id: number;

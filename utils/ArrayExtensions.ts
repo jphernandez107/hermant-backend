@@ -1,5 +1,3 @@
-
-
 interface Array<T> {
 	max(): number;
 	min(): number;
@@ -12,8 +10,8 @@ Array.prototype.max = function(): number {
 }
 
 Array.prototype.min = function(): null {
-    if (this.length === 0) return undefined
-    return Math.min.apply(null, this);
+	if (this.length === 0) return undefined
+	return Math.min.apply(null, this);
 };
 
 Array.prototype.minDate = function(): Date {

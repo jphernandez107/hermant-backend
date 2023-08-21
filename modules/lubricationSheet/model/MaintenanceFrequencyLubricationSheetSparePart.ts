@@ -1,8 +1,7 @@
 import { Model, Sequelize, DataTypes } from "sequelize";
 import { MaintenanceFrequencyLubricationSheetSparePartAttributes, MaintenanceFrequencyLubricationSheetSparePartCreationAttributes, MaintenanceFrequencyLubricationSheetSparePartInstance } from "./IMaintenanceFrequencyLubricationSheetSparePart";
-import { IModel } from "modules/interfaces/IModel";
 
-export class MaintenanceFrequencyLubricationSheetSparePart extends Model<MaintenanceFrequencyLubricationSheetSparePartAttributes, MaintenanceFrequencyLubricationSheetSparePartCreationAttributes> implements MaintenanceFrequencyLubricationSheetSparePartInstance, IModel {
+export class MaintenanceFrequencyLubricationSheetSparePart extends Model<MaintenanceFrequencyLubricationSheetSparePartAttributes, MaintenanceFrequencyLubricationSheetSparePartCreationAttributes> implements MaintenanceFrequencyLubricationSheetSparePartInstance {
 	id: number;
 	maintenance_frequency_id: number;
 	lubrication_sheet_spare_part_id: number;
@@ -10,7 +9,7 @@ export class MaintenanceFrequencyLubricationSheetSparePart extends Model<Mainten
 	created_at: Date;
 	updated_at: Date;
 
-	public associate(models: any): void {
+	public static associate(models: any): void {
 		MaintenanceFrequencyLubricationSheetSparePart.belongsTo(models.lubrication_sheet_spare_part, {
 			foreignKey: 'lubrication_sheet_spare_part_id'
 		});
@@ -19,7 +18,7 @@ export class MaintenanceFrequencyLubricationSheetSparePart extends Model<Mainten
 		});
 	}
 
-	public initModel(sequelize: Sequelize): void {
+	public static initModel(sequelize: Sequelize) {
 		MaintenanceFrequencyLubricationSheetSparePart.init({
 			id: {
 				type: DataTypes.INTEGER,
@@ -62,5 +61,7 @@ export class MaintenanceFrequencyLubricationSheetSparePart extends Model<Mainten
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		});
+
+		return MaintenanceFrequencyLubricationSheetSparePart;
 	}
 }

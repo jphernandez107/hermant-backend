@@ -2,13 +2,17 @@ import { ConstructionSite } from '../model/ConstructionSite';
 import { ConstructionSiteMessages, IConstructionSiteService } from './IConstructionSiteService';
 import { IConstructionSiteRepository } from '../repository/IConstructionSiteRepository';
 import { ConstructionSiteCreationAttributes, ConstructionSiteInstance, ConstructionSiteUpdateAttributes } from '../model/IConstructionSite';
+import { ConstructionSiteRepository } from '../repository/ConstructionSiteRepository';
+import { inject, injectable, singleton } from 'tsyringe';
+import i18n from 'i18n';
 
+@singleton()
+@injectable()
 export class ConstructionSiteService implements IConstructionSiteService {
-	private repository: IConstructionSiteRepository;
-
-	constructor(repository: IConstructionSiteRepository) {
-		this.repository = repository;
-	}
+	
+	constructor(
+		@inject(ConstructionSiteRepository) private repository: IConstructionSiteRepository
+	) {}
 
 	public async getAllSites(): Promise<ConstructionSiteInstance[]> {
 		return await this.repository.getAllSites();

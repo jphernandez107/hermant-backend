@@ -1,15 +1,14 @@
 import { Model, DataTypes, NOW } from "sequelize";
 import { MaintenanceFrequencyAttributes, MaintenanceFrequencyCreationAttributes, MaintenanceFrequencyInstance } from "./IMaintenanceFrequency";
-import { IModel } from "modules/interfaces/IModel";
 
-export class MaintenanceFrequency extends Model<MaintenanceFrequencyAttributes, MaintenanceFrequencyCreationAttributes> implements MaintenanceFrequencyInstance, IModel {
+export class MaintenanceFrequency extends Model<MaintenanceFrequencyAttributes, MaintenanceFrequencyCreationAttributes> implements MaintenanceFrequencyInstance {
 	id!: number;
 	frequency!: number;
 	lubrication_sheet_id!: number;
 	created_at!: Date;
 	updated_at!: Date;
 
-	public associate(models: any): void {
+	public static associate(models: any): void {
 		MaintenanceFrequency.belongsTo(models.lubrication_sheet, {
 			foreignKey: 'lubrication_sheet_id',
 			onDelete: 'CASCADE'
@@ -25,7 +24,7 @@ export class MaintenanceFrequency extends Model<MaintenanceFrequencyAttributes, 
 		});
 	}
 
-	public initModel(sequelize: any): void {
+	public static initModel(sequelize: any) {
 		MaintenanceFrequency.init({
 			id: {
 				type: DataTypes.INTEGER,
@@ -62,6 +61,8 @@ export class MaintenanceFrequency extends Model<MaintenanceFrequencyAttributes, 
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		});
+
+		return MaintenanceFrequency;
 	}
 
 }

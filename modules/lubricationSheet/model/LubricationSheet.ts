@@ -1,13 +1,12 @@
 import { Model, Sequelize, DataTypes, NOW } from "sequelize";
 import { LubricationSheetAttributes, LubricationSheetCreationAttributes, LubricationSheetInstance } from "./ILubricationSheet";
-import { IModel } from "modules/interfaces/IModel";
 
-export class LubricationSheet extends Model<LubricationSheetAttributes, LubricationSheetCreationAttributes> implements LubricationSheetInstance, IModel {
+export class LubricationSheet extends Model<LubricationSheetAttributes, LubricationSheetCreationAttributes> implements LubricationSheetInstance {
 	public id!: number;
 	public created_at!: Date;
 	public updated_at!: Date;
 
-	public associate(models: any): void {
+	public static associate(models: any): void {
 		LubricationSheet.hasMany(models.equipment, {
 			as: 'equipments',
 			foreignKey: "lubrication_sheet_id"
@@ -18,7 +17,7 @@ export class LubricationSheet extends Model<LubricationSheetAttributes, Lubricat
 		});
 	}
 
-	public initModel(sequelize: Sequelize): void {
+	public static initModel(sequelize: Sequelize) {
 		LubricationSheet.init({
 			id: {
 				type: DataTypes.INTEGER,
@@ -41,5 +40,7 @@ export class LubricationSheet extends Model<LubricationSheetAttributes, Lubricat
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		});
+
+		return LubricationSheet;
 	}
 }

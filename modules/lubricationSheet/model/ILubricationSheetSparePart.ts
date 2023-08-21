@@ -1,4 +1,4 @@
-import { MaintenanceFrequencyInstance } from "modules/maintenance/model/IMaintenanceFrequency";
+import { MaintenanceFrequencyInstance } from "../../maintenance/model/IMaintenanceFrequency";
 import { Model, Optional } from "sequelize";
 
 export interface LubricationSheetSparePartAttributes {

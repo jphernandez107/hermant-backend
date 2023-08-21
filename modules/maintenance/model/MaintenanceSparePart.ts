@@ -20,54 +20,56 @@ export class MaintenanceSparePart extends Model<MaintenanceSparePartAttributes, 
 		});
 	}
 
-	public static initModel(sequelize: any): void {
+	public static initModel(sequelize: any) {
 		MaintenanceSparePart.init({
-		id: {
-			type: DataTypes.INTEGER,
-			primaryKey: true,
-			autoIncrement: true
-		},
-		maintenance_id: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-			references: {
-				model: "maintenance",
-				key: "id"
+			id: {
+				type: DataTypes.INTEGER,
+				primaryKey: true,
+				autoIncrement: true
+			},
+			maintenance_id: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+				references: {
+					model: "maintenance",
+					key: "id"
+				}
+			},
+			spare_part_id: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+				references: {
+					model: "spare_part",
+					key: "id"
+				}
+			},
+			quantity: {
+				type: DataTypes.INTEGER
+			},
+			application: {
+				type: DataTypes.STRING
+			},
+			partial_cost: {
+				type: DataTypes.FLOAT
+			},
+			created_at: {
+				type: DataTypes.DATE,
+				defaultValue: NOW
+			},
+			updated_at: {
+				type: DataTypes.DATE,
+				defaultValue: NOW,
 			}
-		},
-		spare_part_id: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-			references: {
-				model: "spare_part",
-				key: "id"
-			}
-		},
-		quantity: {
-			type: DataTypes.INTEGER
-		},
-		application: {
-			type: DataTypes.STRING
-		},
-		partial_cost: {
-			type: DataTypes.FLOAT
-		},
-		created_at: {
-			type: DataTypes.DATE,
-			defaultValue: NOW
-		},
-		updated_at: {
-			type: DataTypes.DATE,
-			defaultValue: NOW,
-		}
-	}, {
-		sequelize,
-		modelName: 'maintenance_spare_part',
-		freezeTableName: true,
-		timestamps: true,
-		updatedAt: 'updated_at',
-		createdAt: 'created_at'
-	});
+		}, {
+			sequelize,
+			modelName: 'maintenance_spare_part',
+			freezeTableName: true,
+			timestamps: true,
+			updatedAt: 'updated_at',
+			createdAt: 'created_at'
+		});
+
+		return MaintenanceSparePart;
 	}
 
 }
