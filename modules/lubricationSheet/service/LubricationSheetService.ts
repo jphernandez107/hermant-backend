@@ -65,7 +65,8 @@ export class LubricationSheetService implements ILubricationSheetService {
 		const sheetRows = await this.lubricationSheetSparePartRepository.createLubricationSheetSparePartsInBulk(lubricationSheetAttributes.spare_parts, sheet.id);
 		if (!sheetRows) throw new Error(LubricationSheetMessages.ERROR_CREATING_SHEET_ROWS);
 		await this.linkMaintenanceFrequenciesToLubricationSheetSpareParts(sheetRows, frequencies, lubricationSheetAttributes.spare_parts);
-		await this.nextMaintenanceService.updateNextMaintenancesForEquipments(sheet.equipments);
+		equipment.lubrication_sheet_id = sheet.id;
+		await this.nextMaintenanceService.updateNextMaintenancesForEquipments([...sheet.equipments || [], equipment]);
 		sheet.addEquipment(equipment);
 		return await this.lubricationSheetRepository.saveLubricationSheet(sheet);
 	}

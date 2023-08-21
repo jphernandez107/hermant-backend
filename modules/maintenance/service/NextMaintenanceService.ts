@@ -25,6 +25,7 @@ export class NextMaintenanceService implements INextMaintenanceService {
 	) {}
 
 	public async updateNextMaintenancesForEquipments(equipments: EquipmentInstance[]): Promise<NextMaintenanceInstance[]> {
+		if (!equipments) return;
 		let nextMaintenances: NextMaintenanceCreationAttributes[] = [];
 		for (let equipment of equipments) {
 			if (!equipment.lubrication_sheet_id) continue;
