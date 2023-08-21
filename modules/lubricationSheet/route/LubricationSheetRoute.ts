@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyRole, UserRole } from "../../..//middleware/jwtMiddleware";
+import { verifyRole, UserRole } from "../../../middleware/jwtMiddleware";
 import { ILubricationSheetController } from "../controller/ILubricationSheetController";
 import { LubricationSheetController } from "../controller/LubricationSheetController";
 import { ILubricationSheetRoute } from "./ILubricationSheetRoute";

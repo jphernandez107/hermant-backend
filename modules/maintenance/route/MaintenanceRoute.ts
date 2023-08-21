@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyRole, UserRole } from "../../..//middleware/jwtMiddleware";
+import { verifyRole, UserRole } from "../../../middleware/jwtMiddleware";
 import { IMaintenanceController } from "../controller/IMaintenanceController";
 import { IMaintenanceRoute } from "./IMaintenanceRoute";
 import { container } from "tsyringe";

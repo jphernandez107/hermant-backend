@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { ISparePartController } from "../controller/ISparePartController";
 import { ISparePartRoute } from "./ISparePartRoute";
-import { verifyRole, UserRole } from "../../..//middleware/jwtMiddleware";
+import { verifyRole, UserRole } from "../../../middleware/jwtMiddleware";
 import { container } from "tsyringe";
 import { SparePartController } from "../controller/SparePartController";
 

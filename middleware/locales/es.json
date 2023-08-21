@@ -67,5 +67,12 @@
 	"ERROR_ACTIVATING_USER": "Error al activar el usuario.",
 	"USER_ACTIVATED": "Usuario activado exitosamente.",
 	"ERROR_DEACTIVATING_USER": "Error al desactivar el usuario.",
-	"USER_DEACTIVATED": "Usuario desactivado exitosamente."
+	"USER_DEACTIVATED": "Usuario desactivado exitosamente.",
+
+	"NO_TOKEN_PROVIDED": "No se proporcionó ningún token.",
+	"FAILED_TO_AUTHENTICATE_TOKEN": "Error al autenticar el token.",
+	"NECESSARY_PERMISSIONS_MISSING": "No tienes los permisos necesarios para realizar esta acción.",
+	"TOKEN_EXPIRED": "El token ha expirado.",
+	"TOKEN_NOT_ACTIVE_YET": "Token inactivo.",
+	"INVALID_USER_ROLE": "Rol inválido."
 }
