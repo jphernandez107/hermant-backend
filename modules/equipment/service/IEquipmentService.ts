@@ -20,7 +20,8 @@ export interface EquipmentHourAddedInBulk {
 	statusCode: number,
 	message: string,
 	equipments: EquipmentInstance[],
-	errors: string[]
+	errors: string[],
+	equipmentHoursAdded: EquipmentHourInstance[],
 }
 
 export const EquipmentMessages = {

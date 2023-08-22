@@ -75,6 +75,7 @@ export class EquipmentService implements IEquipmentService {
 		
 		const equipmentsWithErrors: string[] = [];
 		const equipmentsSuccessfullyModified: EquipmentInstance[] = [];
+		const equipmentHoursAdded: EquipmentHourInstance[] = [];
 		for (let equipmentHour of equipmentHours.hours) {
 			const equipment = equipments.find((equipment) => equipment.code === equipmentHour.code);
 			if (!equipment) {
@@ -84,7 +85,7 @@ export class EquipmentService implements IEquipmentService {
 			const dailyUseHours = equipmentHour.hours / diffDays;
 			const equipmentHoursToAdd: EquipmentHourCreationAttributes[] = [];
 			for (let i = 0; i < diffDays; i++) {
-				const date: Date = equipmentHours.start_date;
+				let date: Date = new Date(equipmentHours.start_date);
 				date.setDate(date.getDate() + i);
 				const equipmentHourAttributes = this.parseEquipmentHourCreationAttributes(dailyUseHours, date, equipmentHours, equipment);
 				equipmentHoursToAdd.push(equipmentHourAttributes);
@@ -92,7 +93,8 @@ export class EquipmentService implements IEquipmentService {
 				equipment.total_hours += equipmentHourAttributes.hours_to_add;
 			}
 			try {
-				await this.equipmentHourRepository.createEquipmentHoursInBulk(equipmentHoursToAdd);
+				const hoursAdded = await this.equipmentHourRepository.createEquipmentHoursInBulk(equipmentHoursToAdd);
+				equipmentHoursAdded.push(...hoursAdded);
 				equipmentsSuccessfullyModified.push(equipment);
 				await this.equipmentRepository.saveEquipment(equipment);
 			} catch (error) {
@@ -106,7 +108,8 @@ export class EquipmentService implements IEquipmentService {
 			statusCode: statusCode,
 			message: message,
 			equipments: equipmentsSuccessfullyModified,
-			errors: equipmentsWithErrors
+			errors: equipmentsWithErrors,
+			equipmentHoursAdded: equipmentHoursAdded
 		};
 	}
 
@@ -155,7 +158,7 @@ export class EquipmentService implements IEquipmentService {
 
 	private parseEquipmentHourCreationAttributes(hoursToAdd: number, date: Date, equipmentHours: EquipmentHourCreationInBulkAttributes, equipment: EquipmentInstance): EquipmentHourCreationAttributes {
 		return {
-			hours_to_add: hoursToAdd,
+			hours_to_add: Math.round(hoursToAdd),
 			total_hours: equipment.total_hours,
 			partial_hours: equipment.partial_hours,
 			date: date,

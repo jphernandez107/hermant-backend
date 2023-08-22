@@ -76,14 +76,13 @@ export default class EquipmentController extends BaseController implements IEqui
 		}
 	}
 	public addUseHoursInBulk = async (req: Request, res: Response): Promise<Response<EquipmentInstance>> => {
-		const { hours: hoursToAdd, start_date, end_date, user_id } = req.body;
-		if (!hoursToAdd || !start_date || !end_date ) throw new Error(i18n.__(EquipmentMessages.INVALID_INPUT));
 		try {
 			const result = await this.equipmentService.addEquipmentHoursInBulk(this.parseEquipmentHourInBulkFromBody(req));
 			return res.status(result.statusCode).json({
 				message: result.message,
 				equipments: result.equipments,
-				errors: result.errors
+				errors: result.errors,
+				equipment_hours_added: result.equipmentHoursAdded
 			});
 		} catch (error) {
 			return this.catchError(res, 500, error, i18n.__(EquipmentMessages.ERROR_ADDING_HOURS));
@@ -217,7 +216,7 @@ export default class EquipmentController extends BaseController implements IEqui
 
 		// Check for required fields
 		if (!hours || !startDate || !endDate || !user_id) {
-			throw Error('Missing required attributes');
+			throw Error(i18n.__(EquipmentMessages.INVALID_INPUT));
 		}
 	
 		const equipmentHourAttributes: EquipmentHourCreationInBulkAttributes = {
