@@ -46,8 +46,8 @@ export class ConstructionSiteController extends BaseController implements IConst
 
 	deleteSite = async (req: Request, res: Response): Promise<Response<number>> => {
 		try {
-			const id = req.body.id as number || null;
-			const code = req.body.code as string || null;
+			const id = parseInt(req.query.id as string) || null;
+			const code = req.query.code as string || null;
 			await this.service.deleteSite(id, code);
 			return res.status(200).json({ 
 				message: i18n.__(ConstructionSiteMessages.SITE_DELETED) 
