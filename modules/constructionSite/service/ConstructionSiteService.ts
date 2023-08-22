@@ -33,9 +33,10 @@ export class ConstructionSiteService implements IConstructionSiteService {
 	}
 
 	public async updateSite(id: number, siteAttributes: ConstructionSiteUpdateAttributes): Promise<[number, ConstructionSiteInstance]> {
+		const count = await this.repository.updateSite(id, siteAttributes);
+		if (count[0] === 0) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
 		const site = await this.repository.getSiteById(id);
 		if (!site) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
-		const count = await this.repository.updateSite(id, siteAttributes);
 		return [count[0], site];
 	}
 

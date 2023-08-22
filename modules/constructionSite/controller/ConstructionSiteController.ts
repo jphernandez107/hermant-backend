@@ -61,11 +61,11 @@ export class ConstructionSiteController extends BaseController implements IConst
 		try {
 			const siteAttributes = this.parseSiteFromBody(req, false);
 			const id: number = Number.parseInt(req.query.id as string);
-			const sites = await this.service.updateSite(id, siteAttributes);
-			if (!sites || sites[0] === 0) throw new Error(i18n.__(ConstructionSiteMessages.ERROR_UPDATING_SITE));
+			const site = await this.service.updateSite(id, siteAttributes);
+			if (!site || site[0] === 0) throw new Error(i18n.__(ConstructionSiteMessages.ERROR_UPDATING_SITE));
 			return res.status(200).json({ 
 				message: i18n.__(ConstructionSiteMessages.SITE_UPDATED), 
-				sites: sites[1] 
+				site: site[1] 
 			});
 		} catch (error) {
 			return this.catchError(res, 500, error, i18n.__(ConstructionSiteMessages.ERROR_UPDATING_SITE));
@@ -119,11 +119,11 @@ export class ConstructionSiteController extends BaseController implements IConst
 			province: province || null,
 			init_date: init_date || null,
 			finish_date: finish_date || null,
-			max_temp: max_temp || null,
-			min_temp: min_temp || null,
-			altitude: altitude || null,
-			dust: dust || null,
-			distance: distance || null,
+			max_temp: max_temp || 0,
+			min_temp: min_temp || 0,
+			altitude: altitude || 0,
+			dust: dust || 0,
+			distance: distance || 0,
 			observations: observations || "",
 		};
 	
