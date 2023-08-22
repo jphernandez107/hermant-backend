@@ -6,5 +6,5 @@ export interface ISparePartController {
 	getSparePartByIdOrExternalCode(req: Request, res: Response): Promise<Response<SparePartInstance>>
 	postNewSparePart(req: Request, res: Response): Promise<Response<SparePartInstance>>
 	deleteSparePart(req: Request, res: Response): Promise<Response<void>>
-	updateSparePart(req: Request, res: Response): Promise<Response<[number, SparePartInstance[]]>>
+	updateSparePart(req: Request, res: Response): Promise<Response<[number, SparePartInstance]>>
 }

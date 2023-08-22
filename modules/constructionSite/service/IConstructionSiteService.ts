@@ -4,7 +4,7 @@ export interface IConstructionSiteService {
 	getAllSites(): Promise<ConstructionSiteInstance[]>;
 	getSiteByIdOrCode(siteId: number | null, siteCode: string | null): Promise<ConstructionSiteInstance | null>;
 	createSite(siteAttributes: ConstructionSiteCreationAttributes): Promise<ConstructionSiteInstance>;
-	updateSite(id: number, siteAttributes: ConstructionSiteUpdateAttributes): Promise<[number, ConstructionSiteInstance[]]>;
+	updateSite(id: number, siteAttributes: ConstructionSiteUpdateAttributes): Promise<[number, ConstructionSiteInstance]>;
 	deleteSite(id: number | null, code: string | null): Promise<void>;
 }
 

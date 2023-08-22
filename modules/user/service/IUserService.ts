@@ -4,11 +4,11 @@ export interface IUserService {
 	getUsersList(): Promise<UserInstance[]>;
 	getUserById(id: number): Promise<UserInstance | null>;
 	createUser(user: UserCreationAttributes): Promise<UserInstance>;
-	updateUser(id: number, user: UserCreationAttributes): Promise<[number, UserInstance[]]>;
+	updateUser(id: number, userAttributes: UserCreationAttributes): Promise<[number, UserInstance]>;
 	deleteUser(id: number): Promise<void>;
 	loginUser(dni: string, password: string): Promise<[string, UserInstance | null]>;
-	activateUser(id: number): Promise<[number, UserInstance[]]>;
-	deactivateUser(id: number): Promise<[number, UserInstance[]]>;
+	activateUser(id: number): Promise<[number, UserInstance]>;
+	deactivateUser(id: number): Promise<[number, UserInstance]>;
 }
 
 export const UserMessages = {

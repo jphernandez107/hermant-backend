@@ -4,7 +4,7 @@ export interface ISparePartService {
 	getAllSpareParts(): Promise<SparePartInstance[]>;
 	getSparePartByIdOrExternalCode(id: number | null, externalCode: string | null): Promise<SparePartInstance | null>;
 	createSparePart(sparePart: SparePartCreationAttributes): Promise<SparePartInstance>;
-	updateSparePart(id: number, sparePart: SparePartUpdateAttributes): Promise<[number, SparePartInstance[]]>;
+	updateSparePart(id: number, sparePart: SparePartUpdateAttributes): Promise<[number, SparePartInstance]>;
 	deleteSparePart(id: number | null, externalCode: string | null): Promise<void>;
 }
 

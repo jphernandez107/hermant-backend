@@ -6,7 +6,7 @@ export interface ILubricationSheetService {
 	getLubricationSheetById(id: number): Promise<LubricationSheetInstance | null>
 	getLubricationSheetByEquipmentCode(equipmentCode: string): Promise<LubricationSheetInstance | null>
 	createLubricationSheet(): Promise<LubricationSheetInstance>
-	updateLubricationSheet(id: number, lubricationSheet: LubricationSheetCreationAttributes): Promise<[number, LubricationSheetInstance[]]>
+	updateLubricationSheet(id: number, lubricationSheet: LubricationSheetCreationAttributes): Promise<[number, LubricationSheetInstance]>
 	deleteLubricationSheet(id: number): Promise<void>
 
 	addSparePartsToLubricationSheet(lubricationSheetAttributes: LubricationSheetCreationAttributes): Promise<LubricationSheetInstance>

@@ -30,10 +30,9 @@ export class LubricationSheetRepository implements ILubricationSheetRepository {
 	public async createLubricationSheet(): Promise<LubricationSheetInstance> {
 		return LubricationSheet.create();
 	}
-	public async updateLubricationSheet(id: number, lubricationSheetAttributes: LubricationSheetCreationAttributes): Promise<[number, LubricationSheetInstance[]]> {
+	public async updateLubricationSheet(id: number, lubricationSheetAttributes: LubricationSheetCreationAttributes): Promise<[number]> {
 		return LubricationSheet.update(lubricationSheetAttributes, {
-			where: { id: id },
-			returning: true
+			where: { id: id }
 		});
 	}
 	public async saveLubricationSheet(lubricationSheet: LubricationSheetInstance): Promise<LubricationSheetInstance> {

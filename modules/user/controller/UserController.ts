@@ -51,8 +51,8 @@ export class UserController extends BaseController implements IUserController {
 
 	public updateUser = async (req: Request, res: Response): Promise<Response<UserInstance>> => {
 		try {
-			const [updated] = await this.service.updateUser(Number(req.params.id), this.parseUserCreationAttributesFromBody(req, false));
-			if (updated[0].length === 0) throw new Error(i18n.__(UserMessages.ERROR_UPDATING_USER));
+			const updated = await this.service.updateUser(Number(req.params.id), this.parseUserCreationAttributesFromBody(req, false));
+			if (updated[0] === 0) throw new Error(i18n.__(UserMessages.ERROR_UPDATING_USER));
 			return res.status(200).json({ 
 				message: i18n.__(UserMessages.USER_UPDATED),
 				user: updated[1] 
@@ -124,6 +124,7 @@ export class UserController extends BaseController implements IUserController {
 			last_name,
 			role
 		} = req.body;
+		console.log("🚀 ~ file: UserController.ts:127 ~ UserController ~ parseUserCreationAttributesFromBody ~ req.body:", req.body)
 	
 		// Check for required fields
 		if (isCreating && (!dni || !password || !first_name || !last_name || !role)) {

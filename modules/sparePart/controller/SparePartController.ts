@@ -54,12 +54,12 @@ export class SparePartController extends BaseController implements ISparePartCon
 			return this.catchError(res, 500, error, i18n.__(SparePartMessages.ERROR_DELETING_SPARE_PART));
 		}
 	}
-	public updateSparePart = async (req: Request, res: Response): Promise<Response<[number, SparePartInstance[]]>> => {
+	public updateSparePart = async (req: Request, res: Response): Promise<Response<[number, SparePartInstance]>> => {
 		try {
-			const equipmentAttributes = this.parseSparePartFromBody(req, false);
+			const sparePartAttributes = this.parseSparePartFromBody(req, false);
 			const id = parseInt(req.query.id as string) || null;
-			const spareParts = await this.sparePartService.updateSparePart(id, equipmentAttributes);
-			if (!spareParts || spareParts[0] === 0) throw new Error(i18n.__(SparePartMessages.ERROR_UPDATING_SPARE_PART));
+			const spareParts = await this.sparePartService.updateSparePart(id, sparePartAttributes);
+			if (spareParts[0] === 0) throw new Error(i18n.__(SparePartMessages.ERROR_UPDATING_SPARE_PART));
 			return res.status(200).json({
 				message: i18n.__(SparePartMessages.SPARE_PART_UPDATED),
 				sparePart: spareParts[1]

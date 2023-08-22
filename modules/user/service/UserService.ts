@@ -31,8 +31,11 @@ export class UserService implements IUserService {
 		return await this.userRepository.createUser(user);
 	}
 
-	public async updateUser(id: number, user: UserCreationAttributes): Promise<[number, UserInstance[]]> {
-		return await this.userRepository.updateUser(id, user);
+	public async updateUser(id: number, userAttributes: UserCreationAttributes): Promise<[number, UserInstance]> {
+		const user = await this.getUserById(id);
+		if (!user) throw new Error(i18n.__(UserMessages.USER_NOT_FOUND));
+		const count = await this.userRepository.updateUser(user.id, userAttributes)
+		return [count[0], user];
 	}
 
 	public async deleteUser(id: number): Promise<void> {
@@ -41,7 +44,7 @@ export class UserService implements IUserService {
 
 	public async loginUser(dni: string, password: string): Promise<[string, UserInstance | null]> {
 		const user = await this.userRepository.getUserByDni(dni);
-		if (!user) throw new Error(i18n.__(UserMessages.USER_NOT_FOUND));
+		if (!user) throw new Error(i18n.__(UserMessages.INCORRECT_PASSWORD));
 		const passwordMatch = await bcrypt.compare(password, user.password);
 		if (!passwordMatch) throw new Error(i18n.__(UserMessages.INCORRECT_PASSWORD));
 
@@ -59,15 +62,17 @@ export class UserService implements IUserService {
 		return [token, user];
 	}
 
-	public async activateUser(id: number): Promise<[number, UserInstance[]]> {
+	public async activateUser(id: number): Promise<[number, UserInstance]> {
 		const user = await this.userRepository.getUserById(id);
 		if (!user) throw new Error(i18n.__(UserMessages.USER_NOT_FOUND));
-		return await this.userRepository.updateUser(id, { active: true });
+		const count = await this.userRepository.updateUser(id, { active: true });
+		return [count[0], user];
 	}
 
-	public async deactivateUser(id: number): Promise<[number, UserInstance[]]> {
+	public async deactivateUser(id: number): Promise<[number, UserInstance]> {
 		const user = await this.userRepository.getUserById(id);
 		if (!user) throw new Error(i18n.__(UserMessages.USER_NOT_FOUND));
-		return await this.userRepository.updateUser(id, { active: false });
+		const count = await this.userRepository.updateUser(id, { active: false });
+		return [count[0], user];
 	}
 }

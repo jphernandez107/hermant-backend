@@ -29,10 +29,9 @@ export class SparePartRepository implements ISparePartRepository {
 	public async createSparePart(sparePartAttributes: SparePartCreationAttributes): Promise<SparePartInstance> {
 		return SparePart.create(sparePartAttributes);
 	}
-	public async updateSparePart(id: number, sparePartAttributes: SparePartUpdateAttributes): Promise<[number, SparePartInstance[]]> {
+	public async updateSparePart(id: number, sparePartAttributes: SparePartUpdateAttributes): Promise<[number]> {
 		return SparePart.update(sparePartAttributes, {
-			where: { id: id },
-			returning: true
+			where: { id: id }
 		});
 	}
 	public async saveSparePart(sparePart: SparePartInstance): Promise<SparePartInstance> {

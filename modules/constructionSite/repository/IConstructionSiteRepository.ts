@@ -6,7 +6,7 @@ export interface IConstructionSiteRepository {
 	getSiteByCode(code: string): Promise<ConstructionSiteInstance | null>;
 	createSite(siteAttributes: ConstructionSiteCreationAttributes): Promise<ConstructionSiteInstance>;
 	deleteSite(site: ConstructionSiteInstance): Promise<void>;
-	updateSite(id: number, siteAttributes: ConstructionSiteUpdateAttributes): Promise<[number, ConstructionSiteInstance[]]>;
+	updateSite(id: number, siteAttributes: ConstructionSiteUpdateAttributes): Promise<[number]>;
 	saveSite(site: ConstructionSiteInstance): Promise<ConstructionSiteInstance>;
 	deleteSite(site: ConstructionSiteInstance): Promise<void>;
 }

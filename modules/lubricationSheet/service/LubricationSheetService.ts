@@ -44,8 +44,11 @@ export class LubricationSheetService implements ILubricationSheetService {
 		return this.lubricationSheetRepository.createLubricationSheet();
 	}
 
-	public async updateLubricationSheet(id: number, lubricationSheetAttributes: LubricationSheetCreationAttributes): Promise<[number, LubricationSheetInstance[]]> {
-		return this.lubricationSheetRepository.updateLubricationSheet(id, lubricationSheetAttributes);
+	public async updateLubricationSheet(id: number, lubricationSheetAttributes: LubricationSheetCreationAttributes): Promise<[number, LubricationSheetInstance]> {
+		const lubricationSheet = await this.getLubricationSheetById(id);
+		if (!lubricationSheet) throw new Error(LubricationSheetMessages.LUBRICATION_SHEET_NOT_FOUND);
+		const count = await this.lubricationSheetRepository.updateLubricationSheet(id, lubricationSheetAttributes);
+		return [count[0], lubricationSheet];
 	}
 
 	public async deleteLubricationSheet(id: number): Promise<void> {

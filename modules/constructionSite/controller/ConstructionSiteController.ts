@@ -57,7 +57,7 @@ export class ConstructionSiteController extends BaseController implements IConst
 		}
 	}
 
-	updateSite = async (req: Request, res: Response): Promise<Response<[number, ConstructionSiteInstance[]]>> => {
+	updateSite = async (req: Request, res: Response): Promise<Response<[number, ConstructionSiteInstance]>> => {
 		try {
 			const siteAttributes = this.parseSiteFromBody(req, false);
 			const id: number = Number.parseInt(req.query.id as string);
@@ -65,7 +65,7 @@ export class ConstructionSiteController extends BaseController implements IConst
 			if (!sites || sites[0] === 0) throw new Error(i18n.__(ConstructionSiteMessages.ERROR_UPDATING_SITE));
 			return res.status(200).json({ 
 				message: i18n.__(ConstructionSiteMessages.SITE_UPDATED), 
-				sites: sites 
+				sites: sites[1] 
 			});
 		} catch (error) {
 			return this.catchError(res, 500, error, i18n.__(ConstructionSiteMessages.ERROR_UPDATING_SITE));

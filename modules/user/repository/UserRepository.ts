@@ -22,8 +22,8 @@ export class UserRepository implements IUserRepository {
 		return await User.create(user);
 	}
 
-	public async updateUser(id: number, user: UserUpdateAttributes): Promise<[number, UserInstance[]]> {
-		return await User.update(user, { where: { id }, returning: true });
+	public async updateUser(id: number, user: UserUpdateAttributes): Promise<[number]> {
+		return await User.update(user, { where: { id } });
 	}
 
 	public async deleteUser(id: number): Promise<void> {

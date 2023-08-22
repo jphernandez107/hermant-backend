@@ -29,10 +29,9 @@ export class ConstructionSiteRepository implements IConstructionSiteRepository {
 		return await ConstructionSite.create(siteAttributes);
 	}
 
-	public async updateSite(id: number, siteAttributes: ConstructionSiteUpdateAttributes): Promise<[number, ConstructionSiteInstance[]]> {
+	public async updateSite(id: number, siteAttributes: ConstructionSiteUpdateAttributes): Promise<[number]> {
 		return ConstructionSite.update(siteAttributes, {
-			where: { id: id },
-			returning: true
+			where: { id: id }
 		});
 	}
 

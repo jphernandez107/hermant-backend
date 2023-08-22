@@ -36,8 +36,7 @@ export class EquipmentRepository implements IEquipmentRepository {
 
 	public async updateEquipment(id: number, equipmentAttributes: EquipmentCreationAttributes): Promise<[number]> {
 		return Equipment.update(equipmentAttributes, {
-			where: { id: id },
-			returning: false
+			where: { id: id }
 		});
 	}
 

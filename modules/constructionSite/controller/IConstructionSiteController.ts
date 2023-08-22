@@ -6,5 +6,5 @@ export interface IConstructionSiteController {
 	getSiteByIdOrCode(req: Request, res: Response): Promise<Response<ConstructionSiteInstance>>;
 	postNewSite(req: Request, res: Response): Promise<Response<ConstructionSiteInstance>>;
 	deleteSite(req: Request, res: Response): Promise<Response<number>>;
-	updateSite(req: Request, res: Response): Promise<Response<[number, ConstructionSiteInstance[]]>>;
+	updateSite(req: Request, res: Response): Promise<Response<[number, ConstructionSiteInstance]>>;
 }

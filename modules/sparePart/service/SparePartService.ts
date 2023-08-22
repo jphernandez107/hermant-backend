@@ -31,8 +31,11 @@ export class SparePartService implements ISparePartService {
 		return this.sparePartRepository.createSparePart(sparePartAttributes);
 	}
 
-	public async updateSparePart(id: number, sparePartAttributes: SparePartInstance): Promise<[number, SparePartInstance[]]> {
-		return this.sparePartRepository.updateSparePart(id, sparePartAttributes);
+	public async updateSparePart(id: number, sparePartAttributes: SparePartInstance): Promise<[number, SparePartInstance]> {
+		const sparePart = await this.sparePartRepository.getSparePartById(id);
+		if (!sparePart) throw new Error(i18n.__(SparePartMessages.SPARE_PART_NOT_FOUND));
+		const count = await this.sparePartRepository.updateSparePart(id, sparePartAttributes);
+		return [count[0], sparePart];
 	}
 
 	public async deleteSparePart(id: number | null, externalCode: string | null): Promise<void> {

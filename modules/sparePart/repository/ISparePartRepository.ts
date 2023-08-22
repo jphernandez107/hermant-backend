@@ -6,7 +6,7 @@ export interface ISparePartRepository {
 	getSparePartById(id: number): Promise<SparePartInstance | null>;
 	getSparePartByExternalCode(externalCode: string): Promise<SparePartInstance | null>;
 	createSparePart(sparePart: SparePartCreationAttributes): Promise<SparePartInstance>;
-	updateSparePart(id: number, sparePart: SparePartUpdateAttributes): Promise<[number, SparePartInstance[]]>;
+	updateSparePart(id: number, sparePart: SparePartUpdateAttributes): Promise<[number]>;
 	saveSparePart(sparePart: SparePartInstance): Promise<SparePartInstance>;
 	deleteSparePart(sparePart: SparePartInstance): Promise<void>;
 }

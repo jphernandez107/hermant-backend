@@ -32,8 +32,11 @@ export class ConstructionSiteService implements IConstructionSiteService {
 		return await this.repository.createSite(siteAttributes);
 	}
 
-	public async updateSite(id: number, siteAttributes: ConstructionSiteUpdateAttributes): Promise<[number, ConstructionSiteInstance[]]> {
-		return await this.repository.updateSite(id, siteAttributes);
+	public async updateSite(id: number, siteAttributes: ConstructionSiteUpdateAttributes): Promise<[number, ConstructionSiteInstance]> {
+		const site = await this.repository.getSiteById(id);
+		if (!site) throw new Error(i18n.__(ConstructionSiteMessages.SITE_NOT_FOUND));
+		const count = await this.repository.updateSite(id, siteAttributes);
+		return [count[0], site];
 	}
 
 	public async deleteSite(id: number | null, code: string | null): Promise<void> {
