@@ -7,7 +7,7 @@
 	"ERROR_CREATING_EQUIPMENT_HOUR": "Ocurrió un error creando horas de uso.",
 	"CANNOT_ADD_NEGATIVE_HOURS": "No debe agregar horas con valores negativos.",
 	"ERROR_UPDATING_EQUIPMENT": "Ocurrió un error actualizando el equipo.",
-	"ERROR_DELETING_EQUIPMENT": "Ocurrió un error eliminando el equipo..",
+	"ERROR_DELETING_EQUIPMENT": "Ocurrió un error eliminando el equipo.",
 	"EQUIPMENT_HOUR_ADDED": "Se agregaron {{equipmentHours}}hs al equipo {{equipment}} correctamente.",
 	"EQUIPMENT_HOUR_BULK_ADDED": "Se agregaron horas de uso a equipos con código: {{equipments}}.",
 	"ERROR_ADDING_HOURS_TO_EQUIPMENTS": "Ocurrió un error agregando horas de uso a equipos con código: {{errorEquipments}}.",

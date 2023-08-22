@@ -50,9 +50,10 @@ export class EquipmentService implements IEquipmentService {
 	}
 
 	public async updateEquipment(id: number | null, code: string | null, equipmentAttributes: EquipmentCreationAttributes): Promise<[number, EquipmentInstance]> {
-		const equipment = await this.getEquipmentByIdOrCode(id, code);
+		let equipment = await this.getEquipmentByIdOrCode(id, code);
 		if (!equipment) throw new Error(i18n.__(EquipmentMessages.EQUIPMENT_NOT_FOUND));
 		const count = await this.equipmentRepository.updateEquipment(equipment.id, equipmentAttributes)
+		equipment = await this.equipmentRepository.getEquipmentById(equipment.id);
 		return [count[0], equipment];
 	}
 
