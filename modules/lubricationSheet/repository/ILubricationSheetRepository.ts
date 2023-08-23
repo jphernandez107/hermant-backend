@@ -1,13 +1,15 @@
+import { QueryOptions, Transaction } from "sequelize";
 import { LubricationSheetCreationAttributes, LubricationSheetInstance } from "../model/ILubricationSheet";
 
 export interface ILubricationSheetRepository {
 	getAllLubricationSheets(): Promise<LubricationSheetInstance[]>
-	getLubricationSheetById(id: number): Promise<LubricationSheetInstance | null>
+	getLubricationSheetById(id: number, options?: QueryOptions): Promise<LubricationSheetInstance | null>
 	getLubricationSheetByEquipmentCode(equipmentCode: string): Promise<LubricationSheetInstance | null>
-	createLubricationSheet(): Promise<LubricationSheetInstance>
+	createLubricationSheet(options?: QueryOptions): Promise<LubricationSheetInstance>
 	updateLubricationSheet(id: number, lubricationSheet: LubricationSheetCreationAttributes): Promise<[number]>
-	saveLubricationSheet(lubricationSheet: LubricationSheetInstance): Promise<LubricationSheetInstance>
+	saveLubricationSheet(lubricationSheet: LubricationSheetInstance, options?: QueryOptions): Promise<LubricationSheetInstance>
 	deleteLubricationSheet(lubricationSheet: LubricationSheetInstance): Promise<void>
+	startTransaction(): Promise<Transaction>
 }
 
 export const LubricationSheetIncludes = [

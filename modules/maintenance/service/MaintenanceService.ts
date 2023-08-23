@@ -13,6 +13,7 @@ import { IEquipmentRepository } from "../../equipment/repository/IEquipmentRepos
 import { EquipmentRepository } from "../../equipment/repository/EquipmentRepository";
 import { EquipmentMessages } from "../../equipment/service/IEquipmentService";
 import i18n from 'i18n';
+import { QueryOptions } from "sequelize";
 
 @singleton()
 @injectable()
@@ -24,13 +25,13 @@ export class MaintenanceService implements IMaintenanceService {
 		@inject(MaintenanceSparePartService) private maintenanceSparePartService: IMaintenanceSparePartService
 	) {}
 
-	public async createMaintenanceFrequenciesInBulk(frequencies: number[], lubricationSheetId: number): Promise<MaintenanceFrequencyInstance[]> {
-		return this.maintenanceFrequencyRepository.createMaintenanceFrequenciesInBulk(frequencies, lubricationSheetId);
+	public async createMaintenanceFrequenciesInBulk(frequencies: number[], lubricationSheetId: number, options?: QueryOptions): Promise<MaintenanceFrequencyInstance[]> {
+		return this.maintenanceFrequencyRepository.createMaintenanceFrequenciesInBulk(frequencies, lubricationSheetId, options);
 	}
 
-	public async deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId: number): Promise<number> {
+	public async deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId: number, options?: QueryOptions): Promise<number> {
 		try {
-			return await this.maintenanceFrequencyRepository.deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId);
+			return await this.maintenanceFrequencyRepository.deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId, options);
 		} catch (error) {
 			console.log("~ file: MaintenanceService.ts:40 ~ MaintenanceService ~ deleteMaintenanceFrequenciesByLubricationSheetId ~ error:", error)
 			return null;

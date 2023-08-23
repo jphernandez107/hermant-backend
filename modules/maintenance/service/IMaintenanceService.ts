@@ -1,10 +1,11 @@
 import { EquipmentInstance } from "../../equipment/model/IEquipment";
 import { MaintenanceFrequencyInstance } from "../model/IMaintenanceFrequency";
 import { MaintenanceCreationAttributes, MaintenanceInstance } from "../model/IMaintenance";
+import { QueryOptions } from "sequelize";
 
 export interface IMaintenanceService {
-	createMaintenanceFrequenciesInBulk(frequencies: number[], lubricationSheetId: number): Promise<MaintenanceFrequencyInstance[]>;
-	deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId: number): Promise<number>;
+	createMaintenanceFrequenciesInBulk(frequencies: number[], lubricationSheetId: number, options?: QueryOptions): Promise<MaintenanceFrequencyInstance[]>;
+	deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId: number, options?: QueryOptions): Promise<number>;
 	getAllMaintenances(): Promise<MaintenanceInstance[]>;
 	createMaintenance(maintenanceAttributes: MaintenanceCreationAttributes): Promise<MaintenanceInstance>;
 }

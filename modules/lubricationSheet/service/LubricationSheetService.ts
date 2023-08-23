@@ -15,6 +15,7 @@ import { NextMaintenanceService } from "../../maintenance/service/NextMaintenanc
 import { EquipmentRepository } from "../../equipment/repository/EquipmentRepository";
 import { IEquipmentRepository } from "../../equipment/repository/IEquipmentRepository";
 import i18n from 'i18n';
+import { QueryOptions } from "sequelize";
 
 @singleton()
 @injectable()
@@ -32,16 +33,16 @@ export class LubricationSheetService implements ILubricationSheetService {
 		return this.lubricationSheetRepository.getAllLubricationSheets();
 	}
 
-	public async getLubricationSheetById(id: number): Promise<LubricationSheetInstance | null> {
-		return this.lubricationSheetRepository.getLubricationSheetById(id);
+	public async getLubricationSheetById(id: number, options?: QueryOptions): Promise<LubricationSheetInstance | null> {
+		return this.lubricationSheetRepository.getLubricationSheetById(id, options);
 	}
 
 	public async getLubricationSheetByEquipmentCode(equipmentCode: string): Promise<LubricationSheetInstance | null> {
 		return this.lubricationSheetRepository.getLubricationSheetByEquipmentCode(equipmentCode);
 	}
 
-	public async createLubricationSheet(): Promise<LubricationSheetInstance> {
-		return this.lubricationSheetRepository.createLubricationSheet();
+	public async createLubricationSheet(options?: QueryOptions): Promise<LubricationSheetInstance> {
+		return this.lubricationSheetRepository.createLubricationSheet(options);
 	}
 
 	public async updateLubricationSheet(id: number, lubricationSheetAttributes: LubricationSheetCreationAttributes): Promise<[number, LubricationSheetInstance]> {
@@ -58,44 +59,52 @@ export class LubricationSheetService implements ILubricationSheetService {
 	}
 
 	public async addSparePartsToLubricationSheet(lubricationSheetAttributes: LubricationSheetCreationAttributes): Promise<LubricationSheetInstance> {
-		this.clearLubricationSheet(lubricationSheetAttributes.id);
-		const equipment = await this.equipmentRepository.getEquipmentByCode(lubricationSheetAttributes.equipment_code);
-		if (!equipment) throw new Error(i18n.__(EquipmentMessages.EQUIPMENT_NOT_FOUND));
-		const sheet = await this.findOrCreateLubricationSheet(lubricationSheetAttributes.id);
-		if (!sheet) throw new Error(LubricationSheetMessages.ERROR_CREATING_LUBRICATION_SHEET);
-		const frequencies = await this.createMaintenanceFrequencies(lubricationSheetAttributes.frequencies, sheet.id);
-		if (!frequencies) throw new Error(LubricationSheetMessages.ERROR_CREATING_MAINTENANCE_FREQUENCIES);
-		const sheetRows = await this.lubricationSheetSparePartRepository.createLubricationSheetSparePartsInBulk(lubricationSheetAttributes.spare_parts, sheet.id);
-		if (!sheetRows) throw new Error(LubricationSheetMessages.ERROR_CREATING_SHEET_ROWS);
-		await this.linkMaintenanceFrequenciesToLubricationSheetSpareParts(sheetRows, frequencies, lubricationSheetAttributes.spare_parts);
-		equipment.lubrication_sheet_id = sheet.id;
-		await this.nextMaintenanceService.updateNextMaintenancesForEquipments([...sheet.equipments || [], equipment]);
-		sheet.addEquipment(equipment);
-		return await this.lubricationSheetRepository.saveLubricationSheet(sheet);
+		const transaction = await this.lubricationSheetRepository.startTransaction();
+		try {
+			this.clearLubricationSheet(lubricationSheetAttributes.id, { transaction });
+			const equipment = await this.equipmentRepository.getEquipmentByCode(lubricationSheetAttributes.equipment_code, { transaction });
+			if (!equipment) throw new Error(i18n.__(EquipmentMessages.EQUIPMENT_NOT_FOUND));
+			let sheet = await this.findOrCreateLubricationSheet(lubricationSheetAttributes.id, { transaction });
+			if (!sheet) throw new Error(LubricationSheetMessages.ERROR_CREATING_LUBRICATION_SHEET);
+			const frequencies = await this.createMaintenanceFrequencies(lubricationSheetAttributes.frequencies, sheet.id, { transaction });
+			if (!frequencies) throw new Error(LubricationSheetMessages.ERROR_CREATING_MAINTENANCE_FREQUENCIES);
+			const sheetRows = await this.lubricationSheetSparePartRepository.createLubricationSheetSparePartsInBulk(lubricationSheetAttributes.spare_parts, sheet.id, { transaction });
+			if (!sheetRows) throw new Error(LubricationSheetMessages.ERROR_CREATING_SHEET_ROWS);
+			await this.linkMaintenanceFrequenciesToLubricationSheetSpareParts(sheetRows, frequencies, lubricationSheetAttributes.spare_parts, { transaction });
+			equipment.lubrication_sheet_id = sheet.id;
+			await this.nextMaintenanceService.updateNextMaintenancesForEquipments([...sheet.equipments || [], equipment]);
+			await sheet.addEquipment(equipment, { transaction });
+			sheet = await this.lubricationSheetRepository.saveLubricationSheet(sheet, { transaction });
+			await transaction.commit();
+			return sheet;
+		} catch (error) {
+			await transaction.rollback();
+			throw error;
+		}
 	}
 
-	private async findOrCreateLubricationSheet(lubricationSheetId: number | null): Promise<LubricationSheetInstance> {
-		const lubricationSheet = await this.getLubricationSheetById(lubricationSheetId);
+	private async findOrCreateLubricationSheet(lubricationSheetId: number | null, options?: QueryOptions): Promise<LubricationSheetInstance> {
+		const lubricationSheet = await this.getLubricationSheetById(lubricationSheetId, options);
 		if (lubricationSheet) return lubricationSheet;
-		return await this.createLubricationSheet();
+		return await this.createLubricationSheet(options);
 	}
 
 
-	private async clearLubricationSheet(lubricationSheetId: number | null): Promise<void> {
-		await this.maintenanceService.deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId);
-		await this.lubricationSheetSparePartRepository.deleteByLubricationSheetId(lubricationSheetId);
+	private async clearLubricationSheet(lubricationSheetId: number | null, options?: QueryOptions): Promise<void> {
+		await this.maintenanceService.deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId, options);
+		await this.lubricationSheetSparePartRepository.deleteByLubricationSheetId(lubricationSheetId, options);
 	}
 
-	private async createMaintenanceFrequencies(frequencies: number[], lubricationSheetId: number): Promise<MaintenanceFrequencyInstance[]> {
-		return await this.maintenanceService.createMaintenanceFrequenciesInBulk(frequencies, lubricationSheetId);
+	private async createMaintenanceFrequencies(frequencies: number[], lubricationSheetId: number, options?: QueryOptions): Promise<MaintenanceFrequencyInstance[]> {
+		return await this.maintenanceService.createMaintenanceFrequenciesInBulk(frequencies, lubricationSheetId, options);
 	}
 
-	private async linkMaintenanceFrequenciesToLubricationSheetSpareParts(sheetRows: LubricationSheetSparePartInstance[], frequencies: MaintenanceFrequencyInstance[], lubricationSheetSpareParts: LubricationSheetSparePartCreationAttributes[]): Promise<void> {
+	private async linkMaintenanceFrequenciesToLubricationSheetSpareParts(sheetRows: LubricationSheetSparePartInstance[], frequencies: MaintenanceFrequencyInstance[], lubricationSheetSpareParts: LubricationSheetSparePartCreationAttributes[], options?: QueryOptions): Promise<void> {
 		for (let i=0; i<lubricationSheetSpareParts.length; i++) {
 			const part = lubricationSheetSpareParts[i];
 			const freqs = frequencies.filter(freq => part.frequencies.includes(freq.frequency));
 			const row = sheetRows.find(row => row.spare_part_id === part.spare_part_id && row.application === part.application && row.quantity === part.quantity)
-			this.lubricationSheetSparePartRepository.addFrequenciesToLubricationSheetSpareParts(row, freqs);
+			this.lubricationSheetSparePartRepository.addFrequenciesToLubricationSheetSpareParts(row, freqs, options);
 		}
 	}
 }

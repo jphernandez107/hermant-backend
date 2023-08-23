@@ -2,6 +2,7 @@ import { EquipmentCreationAttributes, EquipmentInstance } from '../model/IEquipm
 import { EquipmentIncludes, IEquipmentRepository } from './IEquipmentRepository';
 import { Equipment } from '../model/Equipment';
 import { singleton } from 'tsyringe';
+import { QueryOptions } from 'sequelize';
 
 @singleton()
 export class EquipmentRepository implements IEquipmentRepository {
@@ -23,10 +24,11 @@ export class EquipmentRepository implements IEquipmentRepository {
 			});
 	}
 
-	public async getEquipmentByCode(code: string): Promise<EquipmentInstance | null> {
+	public async getEquipmentByCode(code: string, options?: QueryOptions): Promise<EquipmentInstance | null> {
 		return Equipment.findOne({
 			where: { code: code, },
-			include: EquipmentIncludes
+			include: EquipmentIncludes,
+			...options
 		});
 	}
 

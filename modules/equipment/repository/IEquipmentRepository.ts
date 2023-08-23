@@ -1,9 +1,9 @@
+import { QueryOptions } from 'sequelize';
 import { EquipmentCreationAttributes, EquipmentInstance } from '../model/IEquipment';
-
 export interface IEquipmentRepository {
 	getAllEquipments(): Promise<EquipmentInstance[]>;
 	getEquipmentById(id: number): Promise<EquipmentInstance | null>;
-	getEquipmentByCode(code: string): Promise<EquipmentInstance | null>;
+	getEquipmentByCode(code: string, options?: QueryOptions): Promise<EquipmentInstance | null>;
 	createEquipment(equipmentAttributes: EquipmentCreationAttributes): Promise<EquipmentInstance>;
 	updateEquipment(id: number, equipmentAttributes: EquipmentCreationAttributes): Promise<[number]>;
 	saveEquipment(equipment: EquipmentInstance): Promise<EquipmentInstance>;
