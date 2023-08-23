@@ -7,6 +7,7 @@ export interface IEquipmentRepository {
 	createEquipment(equipmentAttributes: EquipmentCreationAttributes): Promise<EquipmentInstance>;
 	updateEquipment(id: number, equipmentAttributes: EquipmentCreationAttributes): Promise<[number]>;
 	saveEquipment(equipment: EquipmentInstance): Promise<EquipmentInstance>;
+	reloadEquipment(equipment: EquipmentInstance, options?: QueryOptions): Promise<EquipmentInstance>;
 	deleteEquipment(equipment: EquipmentInstance): Promise<void>;
 	resetEquipmentPartialHours(equipment: EquipmentInstance): Promise<EquipmentInstance>;
 }

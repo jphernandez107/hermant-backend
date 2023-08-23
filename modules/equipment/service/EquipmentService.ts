@@ -117,7 +117,8 @@ export class EquipmentService implements IEquipmentService {
 		const lubricationSheet = await this.lubricationSheetService.getLubricationSheetById(lubricationSheetId);
 		if (!lubricationSheet) throw new Error(i18n.__(LubricationSheetMessages.LUBRICATION_SHEET_NOT_FOUND));
 		equipment.lubrication_sheet_id = lubricationSheet.id;
-		return this.equipmentRepository.saveEquipment(equipment);
+		await this.equipmentRepository.saveEquipment(equipment);
+		return this.equipmentRepository.reloadEquipment(equipment);
 	}
 	public async addEquipmentToSite(equipment: EquipmentInstance, siteId: number, siteCode: string): Promise<ConstructionSiteInstance> {
 		const site = await this.constructionSiteService.getSiteByIdOrCode(siteId, siteCode);

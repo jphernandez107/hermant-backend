@@ -45,6 +45,12 @@ export class EquipmentRepository implements IEquipmentRepository {
 	public async saveEquipment(equipment: EquipmentInstance): Promise<EquipmentInstance> {
 		return equipment.save();
 	}
+	public async reloadEquipment(equipment: EquipmentInstance, options?: QueryOptions): Promise<EquipmentInstance> {
+		return equipment.reload({
+			include: EquipmentIncludes,
+			...options
+		});
+	}
 
 	public async deleteEquipment(equipment: EquipmentInstance): Promise<void> {
 		return equipment.destroy();
