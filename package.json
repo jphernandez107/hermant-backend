@@ -1,11 +1,12 @@
 {
 	"name": "hermant-backend",
-	"version": "1.0.1",
+	"version": "2.0.0",
 	"description": "Hermant Backend Application",
 	"main": "app.ts",
 	"scripts": {
-		"start": "node -r ts-node/register app.ts",
-		"dev": "nodemon --watch './**/*' -e ts,tsx --exec ts-node app.ts"
+		"start": "NODE_ENV=production node -r ts-node/register app.ts",
+		"dev": "NODE_ENV=development nodemon --watch './**/*' -e ts,tsx --exec ts-node app.ts",
+		"test": "NODE_ENV=test PORT=8081 nodemon --watch './**/*' -e ts,tsx --exec ts-node app.ts"
 	},
 	"dependencies": {
 		"@types/cors": "^2.8.13",
