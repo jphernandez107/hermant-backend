@@ -31,9 +31,9 @@ export class NextMaintenanceService implements INextMaintenanceService {
 		for (let equipment of equipments) {
 			if (!equipment.lubrication_sheet_id) continue;
 			await this.nextMaintenanceRepository.removeNextMaintenancesByEquipmentId(equipment.id, options);
-			const equipmentHours = await this.equipmentHourRepository.getEquipmentHoursByEquipmentId(equipment.id);
+			const equipmentHours = await this.equipmentHourRepository.getEquipmentHoursByEquipmentId(equipment.id, options);
 			const averageUseHours = this.calculateAverageUseHours(equipmentHours);
-			const maintenanceFrequencies = await this.maintenanceFrequencyRepository.getMaintenanceFrequenciesByLubricationSheetId(equipment.lubrication_sheet_id);
+			const maintenanceFrequencies = await this.maintenanceFrequencyRepository.getMaintenanceFrequenciesByLubricationSheetId(equipment.lubrication_sheet_id, options);
 			if (maintenanceFrequencies.length === 0) continue;
 			const nextMaintenancesForEquipment = this.calculateNextMaintenances(maintenanceFrequencies, equipment, averageUseHours);
 			nextMaintenances.push(...nextMaintenancesForEquipment);

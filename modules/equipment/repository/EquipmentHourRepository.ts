@@ -2,6 +2,7 @@ import { EquipmentHourCreationAttributes, EquipmentHourInstance } from '../model
 import { IEquipmentHourRepository } from './IEquipmentHourRepository';
 import { EquipmentHour } from '../model/EquipmentHour';
 import { singleton } from 'tsyringe';
+import { QueryOptions } from 'sequelize';
 
 @singleton()
 export class EquipmentHourRepository implements IEquipmentHourRepository {
@@ -14,12 +15,13 @@ export class EquipmentHourRepository implements IEquipmentHourRepository {
 	public async createEquipmentHoursInBulk(equipmentHours: EquipmentHourCreationAttributes[]): Promise<EquipmentHourInstance[]> {
 		return EquipmentHour.bulkCreate(equipmentHours);
 	}
-	public async getEquipmentHoursByEquipmentId(equipmentId: number): Promise<EquipmentHourInstance[]> {
+	public async getEquipmentHoursByEquipmentId(equipmentId: number, options?: QueryOptions): Promise<EquipmentHourInstance[]> {
 		return EquipmentHour.findAll({ 
 			where: { equipment_id: equipmentId },
 			order: [
 				['date', 'DESC']
-			]
+			],
+			...options
 		});
 	}
 }

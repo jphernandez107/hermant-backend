@@ -6,5 +6,5 @@ export interface IMaintenanceFrequencyRepository {
 	deleteMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId: number, options?: QueryOptions): Promise<number>
 	deleteMaintenanceFrequency(maintenanceFrequency: MaintenanceFrequencyInstance): Promise<void>
 	getMaintenanceFrequencyByLubricationSheetIdAndFrequency(lubricationSheetId: number, frequency: number): Promise<MaintenanceFrequencyInstance | null>
-	getMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId: number): Promise<MaintenanceFrequencyInstance[]>
+	getMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId: number, options?: QueryOptions): Promise<MaintenanceFrequencyInstance[]>
 }

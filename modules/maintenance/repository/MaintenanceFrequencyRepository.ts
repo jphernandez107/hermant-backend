@@ -38,11 +38,12 @@ export class MaintenanceFrequencyRepository implements IMaintenanceFrequencyRepo
 		});
 	}
 
-	public async getMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId: number): Promise<MaintenanceFrequencyInstance[]> {
+	public async getMaintenanceFrequenciesByLubricationSheetId(lubricationSheetId: number, options?: QueryOptions): Promise<MaintenanceFrequencyInstance[]> {
 		return MaintenanceFrequency.findAll({
 			where: {
 				lubrication_sheet_id: lubricationSheetId
-			}
+			},
+			...options
 		});
 	}
 }
