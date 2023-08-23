@@ -2,6 +2,7 @@ import { singleton } from "tsyringe";
 import { NextMaintenanceCreationAttributes, NextMaintenanceInstance } from "../model/INextMaintenance";
 import { NextMaintenance } from "../model/NextMaintenance";
 import { INextMaintenanceRepository, NextMaintenanceIncludes } from "./INextMaintenanceRepository";
+import { QueryOptions } from "sequelize";
 
 @singleton()
 export class NextMaintenanceRepository implements INextMaintenanceRepository {
@@ -14,15 +15,16 @@ export class NextMaintenanceRepository implements INextMaintenanceRepository {
 		});
 	}
 
-	public async removeNextMaintenancesByEquipmentId(equipmentId: number): Promise<number> {
+	public async removeNextMaintenancesByEquipmentId(equipmentId: number, options?: QueryOptions): Promise<number> {
 		return NextMaintenance.destroy({
 			where: {
 				equipment_id: equipmentId
-			}
+			},
+			...options
 		});
 	}
 
-	public async createNextMaintenancesInBulk(nextMaintenances: NextMaintenanceCreationAttributes[]): Promise<NextMaintenanceInstance[]> {
-		return NextMaintenance.bulkCreate(nextMaintenances);
+	public async createNextMaintenancesInBulk(nextMaintenances: NextMaintenanceCreationAttributes[], options?: QueryOptions): Promise<NextMaintenanceInstance[]> {
+		return NextMaintenance.bulkCreate(nextMaintenances, options);
 	}
 }

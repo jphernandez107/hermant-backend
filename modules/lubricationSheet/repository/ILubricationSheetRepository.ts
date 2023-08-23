@@ -8,6 +8,7 @@ export interface ILubricationSheetRepository {
 	createLubricationSheet(options?: QueryOptions): Promise<LubricationSheetInstance>
 	updateLubricationSheet(id: number, lubricationSheet: LubricationSheetCreationAttributes): Promise<[number]>
 	saveLubricationSheet(lubricationSheet: LubricationSheetInstance, options?: QueryOptions): Promise<LubricationSheetInstance>
+	reloadLubricationSheet(lubricationSheet: LubricationSheetInstance, options?: QueryOptions): Promise<LubricationSheetInstance>
 	deleteLubricationSheet(lubricationSheet: LubricationSheetInstance): Promise<void>
 	startTransaction(): Promise<Transaction>
 }

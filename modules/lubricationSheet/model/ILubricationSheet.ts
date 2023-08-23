@@ -1,6 +1,7 @@
 import { Model, Optional } from "sequelize";
 import { LubricationSheetSparePartCreationAttributes } from "./ILubricationSheetSparePart";
 import { EquipmentInstance } from "../../equipment/model/IEquipment";
+import { LubricationSheetSparePart } from "./LubricationSheetSparePart";
 
 export interface LubricationSheetAttributes {
 	id: number;
@@ -9,6 +10,7 @@ export interface LubricationSheetAttributes {
 
 	equipments?: EquipmentInstance[];
 	addEquipment?: (equipment: EquipmentInstance, options?: any) => Promise<void>;
+	lubrication_sheet_spare_parts?: LubricationSheetSparePart[];
 }
 
 export interface LubricationSheetCreationAttributes extends Optional<LubricationSheetAttributes, 'id' | 'created_at' | 'updated_at'> {

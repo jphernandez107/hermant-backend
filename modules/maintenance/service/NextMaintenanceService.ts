@@ -13,6 +13,7 @@ import { IEquipmentHourRepository } from "../../equipment/repository/IEquipmentH
 import i18n from 'i18n';
 
 import "../../../utils/DateExtensions";
+import { QueryOptions } from "sequelize";
 
 @singleton()
 @injectable()
@@ -24,12 +25,12 @@ export class NextMaintenanceService implements INextMaintenanceService {
 		@inject(EquipmentHourRepository) private equipmentHourRepository: IEquipmentHourRepository
 	) {}
 
-	public async updateNextMaintenancesForEquipments(equipments: EquipmentInstance[]): Promise<NextMaintenanceInstance[]> {
+	public async updateNextMaintenancesForEquipments(equipments: EquipmentInstance[], options?: QueryOptions): Promise<NextMaintenanceInstance[]> {
 		if (!equipments) return;
 		let nextMaintenances: NextMaintenanceCreationAttributes[] = [];
 		for (let equipment of equipments) {
 			if (!equipment.lubrication_sheet_id) continue;
-			await this.nextMaintenanceRepository.removeNextMaintenancesByEquipmentId(equipment.id);
+			await this.nextMaintenanceRepository.removeNextMaintenancesByEquipmentId(equipment.id, options);
 			const equipmentHours = await this.equipmentHourRepository.getEquipmentHoursByEquipmentId(equipment.id);
 			const averageUseHours = this.calculateAverageUseHours(equipmentHours);
 			const maintenanceFrequencies = await this.maintenanceFrequencyRepository.getMaintenanceFrequenciesByLubricationSheetId(equipment.lubrication_sheet_id);
@@ -38,7 +39,7 @@ export class NextMaintenanceService implements INextMaintenanceService {
 			nextMaintenances.push(...nextMaintenancesForEquipment);
 		}
 		nextMaintenances = nextMaintenances.filter(nextMaintenance => nextMaintenance.maintenance_date.validateDate());
-		return await this.nextMaintenanceRepository.createNextMaintenancesInBulk(nextMaintenances);
+		return await this.nextMaintenanceRepository.createNextMaintenancesInBulk(nextMaintenances, options);
 	}
 
 	public async getAllNextMaintenances(): Promise<NextMaintenanceInstance[]> {

@@ -1,8 +1,9 @@
+import { QueryOptions } from "sequelize";
 import { EquipmentInstance } from "../../equipment/model/IEquipment";
 import { NextMaintenanceInstance } from "../model/INextMaintenance";
 
 export interface INextMaintenanceService {
-	updateNextMaintenancesForEquipments(equipments: EquipmentInstance[]): Promise<NextMaintenanceInstance[]>;
+	updateNextMaintenancesForEquipments(equipments: EquipmentInstance[], options?: QueryOptions): Promise<NextMaintenanceInstance[]>;
 	getAllNextMaintenances(): Promise<NextMaintenanceInstance[]>;
 }
 

@@ -98,7 +98,7 @@ export class LubricationSheetController extends BaseController implements ILubri
 				spare_part_id: sparePart.spare_part_id,
 				application: sparePart.application,
 				quantity: sparePart.quantity,
-				frequencies: sparePart.frequencies,
+				raw_frequencies: sparePart.frequencies,
 			});
 		}
 		return spareParts;

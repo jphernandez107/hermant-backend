@@ -72,9 +72,10 @@ export class LubricationSheetService implements ILubricationSheetService {
 			if (!sheetRows) throw new Error(LubricationSheetMessages.ERROR_CREATING_SHEET_ROWS);
 			await this.linkMaintenanceFrequenciesToLubricationSheetSpareParts(sheetRows, frequencies, lubricationSheetAttributes.spare_parts, { transaction });
 			equipment.lubrication_sheet_id = sheet.id;
-			await this.nextMaintenanceService.updateNextMaintenancesForEquipments([...sheet.equipments || [], equipment]);
+			await this.nextMaintenanceService.updateNextMaintenancesForEquipments([...sheet.equipments || [], equipment], { transaction });
 			await sheet.addEquipment(equipment, { transaction });
 			sheet = await this.lubricationSheetRepository.saveLubricationSheet(sheet, { transaction });
+			sheet = await this.lubricationSheetRepository.reloadLubricationSheet(sheet, { transaction });
 			await transaction.commit();
 			return sheet;
 		} catch (error) {
@@ -102,9 +103,9 @@ export class LubricationSheetService implements ILubricationSheetService {
 	private async linkMaintenanceFrequenciesToLubricationSheetSpareParts(sheetRows: LubricationSheetSparePartInstance[], frequencies: MaintenanceFrequencyInstance[], lubricationSheetSpareParts: LubricationSheetSparePartCreationAttributes[], options?: QueryOptions): Promise<void> {
 		for (let i=0; i<lubricationSheetSpareParts.length; i++) {
 			const part = lubricationSheetSpareParts[i];
-			const freqs = frequencies.filter(freq => part.frequencies.includes(freq.frequency));
+			const freqs = frequencies.filter(freq => part.raw_frequencies.includes(freq.frequency));
 			const row = sheetRows.find(row => row.spare_part_id === part.spare_part_id && row.application === part.application && row.quantity === part.quantity)
-			this.lubricationSheetSparePartRepository.addFrequenciesToLubricationSheetSpareParts(row, freqs, options);
+			await this.lubricationSheetSparePartRepository.addFrequenciesToLubricationSheetSpareParts(row, freqs, options);
 		}
 	}
 }

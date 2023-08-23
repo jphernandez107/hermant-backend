@@ -43,6 +43,12 @@ export class LubricationSheetRepository implements ILubricationSheetRepository {
 	public async saveLubricationSheet(lubricationSheet: LubricationSheetInstance, options?: QueryOptions): Promise<LubricationSheetInstance> {
 		return lubricationSheet.save(options);
 	}
+	public async reloadLubricationSheet(lubricationSheet: LubricationSheetInstance, options?: QueryOptions): Promise<LubricationSheetInstance> {
+		return lubricationSheet.reload({
+			include: LubricationSheetIncludes,
+			...options
+		});
+	}
 	public async deleteLubricationSheet(lubricationSheet: LubricationSheetInstance): Promise<void> {
 		return lubricationSheet.destroy()
 	}

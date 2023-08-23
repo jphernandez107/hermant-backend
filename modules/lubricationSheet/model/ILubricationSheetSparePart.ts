@@ -1,3 +1,4 @@
+import { SparePart } from "modules/sparePart/model/SparePart";
 import { MaintenanceFrequencyInstance } from "../../maintenance/model/IMaintenanceFrequency";
 import { Model, Optional } from "sequelize";
 
@@ -9,10 +10,13 @@ export interface LubricationSheetSparePartAttributes {
 	application: string;
 	created_at: Date;
 	updated_at: Date;
+
+	spare_part?: SparePart;
+	frequencies?: MaintenanceFrequencyInstance[];
 }
 
 export interface LubricationSheetSparePartCreationAttributes extends Optional<LubricationSheetSparePartAttributes, 'id' | 'lubrication_sheet_id' | 'created_at' | 'updated_at'> {
-	frequencies: number[];
+	raw_frequencies: number[];
 }
 export type LubricationSheetSparePartInstance = LubricationSheetSparePartAttributes & Model<LubricationSheetSparePartAttributes, LubricationSheetSparePartCreationAttributes>;
 
