@@ -53,9 +53,9 @@ export class MaintenanceController extends BaseController implements IMaintenanc
 		return {
 			equipment_code: req.body.equipment_code,
 			maintenance_frequency: req.body.maintenance_frequency,
-			maintenance_duration: req.body.maintenance_duration || 0,
+			maintenance_duration: req.body.maintenance_duration,
 			maintenance_date: req.body.maintenance_date,
-			maintenance_cost: req.body.maintenance_cost || 0,
+			maintenance_cost: req.body.maintenance_cost,
 			reset_equipment_partial_hours: req.body.reset_equipment_partial_hours || false,
 			spare_parts: this.parseSparePartRowsFromBody(req)
 		};

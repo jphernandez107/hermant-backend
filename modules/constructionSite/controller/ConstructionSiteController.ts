@@ -115,16 +115,16 @@ export class ConstructionSiteController extends BaseController implements IConst
 		const siteAttributes: ConstructionSiteCreationAttributes = {
 			code: code,
 			name: name,
-			district: district || null,
-			province: province || null,
-			init_date: init_date || null,
-			finish_date: finish_date || null,
-			max_temp: max_temp || 0,
-			min_temp: min_temp || 0,
-			altitude: altitude || 0,
-			dust: dust || 0,
-			distance: distance || 0,
-			observations: observations || "",
+			district: district,
+			province: province,
+			init_date: init_date,
+			finish_date: finish_date,
+			max_temp: max_temp,
+			min_temp: min_temp,
+			altitude: altitude,
+			dust: dust,
+			distance: distance,
+			observations: observations,
 		};
 	
 		return siteAttributes;

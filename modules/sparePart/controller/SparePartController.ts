@@ -114,10 +114,10 @@ export class SparePartController extends BaseController implements ISparePartCon
 			application: application,
 			brand: brand,
 			model: model,
-			stock: stock || 0,
-			unit_price: unit_price || null,
-			detail_link: detail_link || null,
-			observations: observations || null,
+			stock: stock,
+			unit_price: unit_price,
+			detail_link: detail_link,
+			observations: observations,
 		};
 	
 		return equipmentAttributes;

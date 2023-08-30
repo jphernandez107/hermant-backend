@@ -84,7 +84,7 @@ export class LubricationSheetController extends BaseController implements ILubri
 
 	private parseLubricationSheetFromBody(req: Request): LubricationSheetCreationAttributes {
 		return {
-			id: req.body.lubrication_sheet_id || null,
+			id: req.body.lubrication_sheet_id,
 			equipment_code: req.body.equipment_code,
 			frequencies: req.body.frequencies,
 			spare_parts: this.parseSparePartRowsFromBody(req),
