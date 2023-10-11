@@ -82,11 +82,17 @@ export class EquipmentService implements IEquipmentService {
 				equipmentsWithErrors.push(equipmentHour.code);
 				continue;
 			}
-			const dailyUseHours = equipmentHour.hours / diffDays;
+			const dailyUseHoursBase = Math.floor(equipmentHour.hours / diffDays);
+			let residue = equipmentHour.hours % diffDays;
 			const equipmentHoursToAdd: EquipmentHourCreationAttributes[] = [];
 			for (let i = 0; i < diffDays; i++) {
 				let date: Date = new Date(equipmentHours.start_date);
 				date.setDate(date.getDate() + i);
+				let dailyUseHours = dailyUseHoursBase;
+				if (residue > 0) {
+					dailyUseHours++;
+					residue--;
+				}
 				const equipmentHourAttributes = this.parseEquipmentHourCreationAttributes(dailyUseHours, date, equipmentHours, equipment);
 				equipmentHoursToAdd.push(equipmentHourAttributes);
 				equipment.partial_hours += equipmentHourAttributes.hours_to_add;
