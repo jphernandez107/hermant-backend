@@ -20,6 +20,7 @@ export class EquipmentRoute implements IEquipmentRoute {
 		router.put("/lubricationsheet/add", verifyRole(this.role), this.equipmentController.addLubricationSheetToEquipment);
 		router.put('/site/add', verifyRole(this.role), this.equipmentController.addEquipmentToSite);
 		router.put('/site/remove', verifyRole(this.role), this.equipmentController.removeEquipmentFromSite);
+		router.get("/hours", verifyRole(this.role), this.equipmentController.getEquipmentHoursByEquipment);
 		return router;
 	}
 }

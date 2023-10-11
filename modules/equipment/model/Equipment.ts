@@ -37,7 +37,7 @@ export class Equipment extends Model<EquipmentAttributes, EquipmentCreationAttri
 			foreignKey: "equipment_id"
 		});
 		Equipment.hasMany(models.equipment_hour, {
-			as: 'equipment_hour',
+			as: 'equipment_hours',
 			foreignKey: "equipment_id"
 		});
 		Equipment.hasMany(models.next_maintenance, {

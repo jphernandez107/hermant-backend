@@ -13,6 +13,7 @@
 	"ERROR_ADDING_HOURS_TO_EQUIPMENTS": "Error adding use hours to equipments with code: {{errorEquipments}}.",
 	"ERROR_ADDING_HOURS": "Error trying to add use hours to equipment.",
 	"ERROR_ADDING_LUBRICATION_SHEET": "Error trying to add lubrication sheet to equipment.",
+	"ERROR_FETCHING_EQUIPMENT_HOURS": "Error fetching equipment hours.",
 	"EQUIPMENT_ADDED_TO_LUBRICATION_SHEET": "Lubrication sheet successfully linked to {{equipment}}.",
 	"EQUIPMENT_ADDED_TO_SITE": "{{equipment}} added to site {{site}} successfully.",
 	"ERROR_ADDING_EQUIPMENT_TO_SITE": "Error trying to add equipment to site.",

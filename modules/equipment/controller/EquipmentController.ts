@@ -2,7 +2,7 @@ import e, { Request, Response } from 'express';
 import { IEquipmentController } from "./IEquipmentController";
 import { IEquipmentService, EquipmentMessages } from "../service/IEquipmentService";
 import { EquipmentCreationAttributes, EquipmentInstance } from '../model/IEquipment';
-import { EquipmentHourCreationInBulkAttributes, EquipmentHourCreationInBulkItemAttributes } from '../model/IEquipmentHour';
+import { EquipmentHourCreationInBulkAttributes, EquipmentHourCreationInBulkItemAttributes, EquipmentHourInstance } from '../model/IEquipmentHour';
 import { BaseController } from '../../interfaces/BaseController';
 import { EquipmentService } from '../service/EquipmentService';
 import { autoInjectable, inject } from 'tsyringe';
@@ -132,6 +132,17 @@ export default class EquipmentController extends BaseController implements IEqui
 			});
 		} catch (error) {
 			return this.catchError(res, 500, error, i18n.__(EquipmentMessages.ERROR_REMOVING_EQUIPMENT_FROM_SITE));
+		}
+	}
+
+	public getEquipmentHoursByEquipment = async (req: Request, res: Response): Promise<Response<EquipmentHourInstance[]>> => {
+		try {
+			const equipment = await this.findEquipmentByIdOrCode(req);
+			if (!equipment) throw new Error(i18n.__(EquipmentMessages.EQUIPMENT_NOT_FOUND));
+			const equipmentHours = await this.equipmentService.getEquipmentHoursByEquipmentId(equipment.id);
+			return res.status(200).json(equipmentHours);
+		} catch (error) {
+			return this.catchError(res, 500, error, i18n.__(EquipmentMessages.ERROR_FETCHING_EQUIPMENT_HOURS));
 		}
 	}
 

@@ -12,6 +12,7 @@
 	"EQUIPMENT_HOUR_BULK_ADDED": "Se agregaron horas de uso a equipos con código: {{equipments}}.",
 	"ERROR_ADDING_HOURS_TO_EQUIPMENTS": "Ocurrió un error agregando horas de uso a equipos con código: {{errorEquipments}}.",
 	"ERROR_ADDING_HOURS": "Ocurrió un error agregando horas al equipo.",
+	"ERROR_FETCHING_EQUIPMENT_HOURS": "Ocurrió un error obteniendo las horas de uso del equipo.",
 	"ERROR_ADDING_LUBRICATION_SHEET": "Ocurrió un error tratando de agregar una planilla de lubricación al equipo.",
 	"EQUIPMENT_ADDED_TO_LUBRICATION_SHEET": "Planilla de lubricación vinculada correctamente al equipo {{equipment}}.",
 	"EQUIPMENT_ADDED_TO_SITE": "{{equipment}} agregado a la obra {{site}} correctamente.",

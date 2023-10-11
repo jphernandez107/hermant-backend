@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { EquipmentInstance } from '../model/IEquipment';
+import { EquipmentHourInstance } from '../model/IEquipmentHour';
 
 export interface IEquipmentController {
 	getEquipmentsList(req: Request, res: Response): Promise<Response<EquipmentInstance[]>>;
@@ -11,4 +12,5 @@ export interface IEquipmentController {
 	addLubricationSheetToEquipment(req: Request, res: Response): Promise<Response<EquipmentInstance>>;
 	addEquipmentToSite(req: Request, res: Response): Promise<Response<EquipmentInstance>>;
 	removeEquipmentFromSite(req: Request, res: Response): Promise<Response<EquipmentInstance>>;
+	getEquipmentHoursByEquipment(req: Request, res: Response): Promise<Response<EquipmentHourInstance[]>>;
 }

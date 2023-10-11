@@ -7,3 +7,9 @@ export interface IEquipmentHourRepository {
 	createEquipmentHoursInBulk(equipmentHours: EquipmentHourCreationAttributes[]): Promise<EquipmentHourInstance[]>;
 	getEquipmentHoursByEquipmentId(equipmentId: number, options?: QueryOptions): Promise<EquipmentHourInstance[]>;
 }
+
+export const EquipmentHourIncludes = [
+	{
+		association: 'construction_site'
+	}
+];
