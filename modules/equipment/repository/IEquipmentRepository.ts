@@ -49,3 +49,17 @@ export const EquipmentIncludes = [
 		]
 	},
 ];
+
+export const EquipmentListIncludes = [
+	{
+		association: 'construction_site'
+	},
+	{
+		association: 'next_maintenances',
+		include: [
+			{
+				association: 'maintenance_frequency'
+			}
+		]
+	},
+];

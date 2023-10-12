@@ -1,5 +1,5 @@
 import { EquipmentCreationAttributes, EquipmentInstance } from '../model/IEquipment';
-import { EquipmentIncludes, IEquipmentRepository } from './IEquipmentRepository';
+import { EquipmentIncludes, EquipmentListIncludes, IEquipmentRepository } from './IEquipmentRepository';
 import { Equipment } from '../model/Equipment';
 import { singleton } from 'tsyringe';
 import { QueryOptions } from 'sequelize';
@@ -9,7 +9,7 @@ export class EquipmentRepository implements IEquipmentRepository {
 
 	public async getAllEquipments(): Promise<EquipmentInstance[]> {
 		return Equipment.findAll({
-			include: EquipmentIncludes,
+			include: EquipmentListIncludes,
 			order: [
 				['code', 'DESC']
 			]
