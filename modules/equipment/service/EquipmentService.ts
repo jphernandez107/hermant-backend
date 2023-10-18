@@ -134,7 +134,7 @@ export class EquipmentService implements IEquipmentService {
 		return await this.constructionSiteService.getSiteByIdOrCode(site.id, site.code);
 	}
 	public async removeEquipmentFromSite(equipment: EquipmentInstance, siteId: number, siteCode: string): Promise<ConstructionSiteInstance> {
-		const principalSite = await this.getEquipmentByIdOrCode(null, "T01");
+		const principalSite = await this.constructionSiteService.getSiteByIdOrCode(null, "T01");
 		equipment.construction_site_id = principalSite?.id || null; 
 		await this.equipmentRepository.saveEquipment(equipment);
 		const site = await this.constructionSiteService.getSiteByIdOrCode(siteId, siteCode);
